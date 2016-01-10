@@ -10,6 +10,10 @@ description = {
 }
 dependencies = {
     "lua >= 5.1",
+    "lua-lru",
+    "arc4random",
+    "lua-mnemonic",
+    "lxsh",
 }
 build = {
     type = "builtin",

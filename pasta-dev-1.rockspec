@@ -10,6 +10,7 @@ description = {
 }
 dependencies = {
     "lua >= 5.1",
+    "lapis",
     "lua-lru",
     "arc4random",
     "lua-mnemonic",

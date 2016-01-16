@@ -20,5 +20,6 @@ build = {
     type = "builtin",
     modules = {
         ['pasta'] = 'src/pasta/pasta.lua',
+        ['pasta.views.index'] = 'src/pasta/views/index.lua',
     },
 }

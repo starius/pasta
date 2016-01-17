@@ -2,7 +2,7 @@ local lapis = require("lapis")
 local model = require("pasta.models")
 local app = lapis.Application()
 
-app:post("schema", "/scheme", function()
+app:get("schema", "/schema", function()
     model.create_schema()
 end)
 

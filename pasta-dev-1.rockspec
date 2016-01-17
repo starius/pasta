@@ -15,6 +15,7 @@ dependencies = {
     "arc4random",
     "lua-mnemonic",
     "lxsh",
+    "luacrypto",
 }
 build = {
     type = "builtin",

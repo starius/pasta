@@ -9,6 +9,8 @@ config({"development", "production"}, {
         password = "myPassword",
         database = "myDatabase",
     },
+    hash_secret1 = 'hash_secret1',
+    hash_secret2 = 'hash_secret2',
 })
 
 config("production", {

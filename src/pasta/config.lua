@@ -5,9 +5,9 @@ config({"development", "production"}, {
     postgres = {
         backend = "pgmoon",
         host = "127.0.0.1",
-        user = "myUser",
-        password = "myPassword",
-        database = "myDatabase",
+        user = "foo",
+        password = "bar",
+        database = "foodb",
     },
     hash_secret1 = 'hash_secret1',
     hash_secret2 = 'hash_secret2',

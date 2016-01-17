@@ -8,6 +8,7 @@ Fields of model Pasta:
   * boolean self_burning
   * varchar filename
   * string content
+  * varchar password (used to delete or update)
 
 Filename and content of self-burning pastas are encrypted
 with lapis.encode_with_secret(text, token).
@@ -26,6 +27,7 @@ models.create_schema = function()
         {"self_burning", schema.types.boolean},
         {"filename", schema.types.varchar},
         {"content", schema.types.text},
+        {"password", schema.types.varchar},
     })
     schema.create_index("pasta", "hash")
 end

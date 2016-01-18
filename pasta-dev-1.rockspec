@@ -20,9 +20,8 @@ dependencies = {
 build = {
     type = "builtin",
     modules = {
-        ['pasta'] = 'src/pasta/pasta.lua',
+        ['pasta.pasta'] = 'src/pasta/pasta.lua',
         ['pasta.views.index'] = 'src/pasta/views/index.lua',
-        ['pasta.config'] = 'src/pasta/config.lua',
         ['pasta.models'] = 'src/pasta/models.lua',
     },
 }

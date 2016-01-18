@@ -12,7 +12,8 @@ local function makeToken(nwords)
 end
 
 local function makeHash(token)
-    return crypto.digest('SHA256', token)
+    local text = config.hash_secret1 .. token .. config.hash_secret2
+    return crypto.digest('SHA256', text)
 end
 
 app:get("schema", "/schema", function()

@@ -16,6 +16,16 @@ local function makeHash(token)
     return crypto.digest('SHA256', text)
 end
 
+local function findFreeToken(nwords)
+    for i = nwords, nwords * 2 do
+        local token = makeToken(i)
+        local hash = makeHash(token)
+        if not model.Pasta:find(hash) then
+            return token
+        end
+    end
+end
+
 app:get("schema", "/schema", function()
     model.create_schema()
 end)
@@ -25,7 +35,10 @@ app:get("index", "/", function()
 end)
 
 app:post("create", "/create", function(request)
-    local token = makeToken(config.nwords_short)
+    local token = findFreeToken(config.nwords_short)
+    if not token then
+        return "No free tokens available"
+    end
     local p = model.Pasta:create {
         hash = makeHash(token),
         self_burning = false,

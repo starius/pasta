@@ -26,6 +26,14 @@ local function findFreeToken(nwords)
     end
 end
 
+local function loadPaste(request)
+    request.token = request.params.token
+    request.hash = makeHash(request.token)
+    request.p = model.Pasta:find(request.hash)
+    assert(request.p, "No such pasta")
+    request.p_content = request.p.content
+end
+
 app:get("schema", "/schema", function()
     model.create_schema()
 end)
@@ -54,24 +62,12 @@ app:post("create", "/create", function(request)
 end)
 
 app:get("view_pasta", "/:token", function(request)
-    request.token = request.params.token
-    request.hash = makeHash(request.token)
-    request.p = model.Pasta:find(request.hash)
-    if not request.p then
-        return "No such pasta"
-    end
-    request.p_content = request.p.content
+    loadPaste(request)
     return {render = require "pasta.views.view_pasta"}
 end)
 
 app:get("raw_pasta", "/:token/raw", function(request)
-    request.token = request.params.token
-    request.hash = makeHash(request.token)
-    request.p = model.Pasta:find(request.hash)
-    if not request.p then
-        return "No such pasta"
-    end
-    request.p_content = request.p.content
+    loadPaste(request)
     request.res.headers["Content-Type"] = "text/plain"
     return {layout = false, render = require "pasta.views.raw_pasta"}
 end)

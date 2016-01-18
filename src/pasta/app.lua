@@ -72,4 +72,10 @@ app:get("raw_pasta", "/:token/raw", function(request)
     return {layout = false, render = require "pasta.views.raw_pasta"}
 end)
 
+app:get("download_pasta", "/:token/download", function(request)
+    loadPaste(request)
+    request.res.headers["Content-Type"] = "application/octet-stream"
+    return {layout = false, render = require "pasta.views.raw_pasta"}
+end)
+
 return app

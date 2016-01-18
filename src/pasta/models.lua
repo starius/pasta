@@ -19,7 +19,9 @@ local models = {}
 local Model = require("lapis.db.model").Model
 local schema = require("lapis.db.schema")
 
-models.Pasta = Model:extend("Pasta")
+models.Pasta = Model:extend("pasta", {
+    primary_key = "hash",
+})
 
 models.create_schema = function()
     schema.create_table("pasta", {

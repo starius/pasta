@@ -11,6 +11,7 @@ config({"development", "production"}, {
     },
     hash_secret1 = 'hash_secret1',
     hash_secret2 = 'hash_secret2',
+    nwords_short = 3,
 })
 
 config("production", {

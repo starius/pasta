@@ -1,26 +1,17 @@
-local Widget
-Widget = require("lapis.html").Widget
-local Index
+local Widget, escape
+do
+  local _obj_0 = require("lapis.html")
+  Widget, escape = _obj_0.Widget, _obj_0.escape
+end
+local ViewPasta
 do
   local _class_0
   local _parent_0 = Widget
   local _base_0 = {
     content = function(self)
-      h1("Pasta")
-      return form({
-        method = "POST",
-        action = self:url_for("create")
-      }, function()
-        textarea({
-          name = "content",
-          cols = 80,
-          rows = 24
-        })
-        br()
-        return input({
-          type = "submit",
-          value = "Upload"
-        })
+      h1("Pasta " .. self.token)
+      return pre(function()
+        return raw(escape(self.p_content))
       end)
     end
   }
@@ -31,7 +22,7 @@ do
       return _class_0.__parent.__init(self, ...)
     end,
     __base = _base_0,
-    __name = "Index",
+    __name = "ViewPasta",
     __parent = _parent_0
   }, {
     __index = function(cls, name)
@@ -55,6 +46,6 @@ do
   if _parent_0.__inherited then
     _parent_0.__inherited(_parent_0, _class_0)
   end
-  Index = _class_0
+  ViewPasta = _class_0
   return _class_0
 end

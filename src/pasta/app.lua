@@ -64,4 +64,16 @@ app:get("view_pasta", "/:token", function(request)
     return {render = require "pasta.views.view_pasta"}
 end)
 
+app:get("raw_pasta", "/:token/raw", function(request)
+    request.token = request.params.token
+    request.hash = makeHash(request.token)
+    request.p = model.Pasta:find(request.hash)
+    if not request.p then
+        return "No such pasta"
+    end
+    request.p_content = request.p.content
+    request.res.headers["Content-Type"] = "text/plain"
+    return {layout = false, render = require "pasta.views.raw_pasta"}
+end)
+
 return app

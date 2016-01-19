@@ -9,6 +9,7 @@ local config = require("lapis.config").get()
 local app = lapis.Application()
 
 app.layout = require("pasta.views.layout")
+app.views_prefix = "pasta.views"
 
 if not config.print_stack_to_browser then
     -- http://leafo.net/lapis/reference/actions.html
@@ -51,7 +52,7 @@ app:get("schema", "/schema", function()
 end)
 
 app:get("index", "/", function()
-    return {render = require "pasta.views.index"}
+    return {render = true}
 end)
 
 app:post("create", "/create", function(request)
@@ -78,7 +79,7 @@ end)
 
 app:get("view_pasta", "/:token", function(request)
     loadPaste(request)
-    return {render = require "pasta.views.view_pasta"}
+    return {render = true}
 end)
 
 local function rawPasta(request)
@@ -92,7 +93,7 @@ local function rawPasta(request)
         }
     end
     request.res.headers["Content-Type"] = "text/plain; charset=utf-8"
-    return {layout = false, render = require "pasta.views.raw_pasta"}
+    return {layout = false, render = "raw_pasta"}
 end
 
 app:get("raw_pasta0", "/:token/raw", rawPasta)
@@ -109,7 +110,7 @@ local function downloadPasta(request)
         }
     end
     request.res.headers["Content-Type"] = "application/octet-stream"
-    return {layout = false, render = require "pasta.views.raw_pasta"}
+    return {layout = false, render = "raw_pasta"}
 end
 
 app:get("download_pasta0", "/:token/download", downloadPasta)

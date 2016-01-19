@@ -72,7 +72,7 @@ end)
 
 local function rawPasta(request)
     loadPaste(request)
-    if request.p.filename ~= urldecode(request.params.filename) then
+    if request.p.filename ~= urldecode(request.params.filename or '') then
         return {
             redirect_to = request:url_for("raw_pasta", {
                 token = request.params.token,
@@ -89,7 +89,7 @@ app:get("raw_pasta", "/:token/raw/:filename", rawPasta)
 
 local function downloadPasta(request)
     loadPaste(request)
-    if request.p.filename ~= urldecode(request.params.filename) then
+    if request.p.filename ~= urldecode(request.params.filename or '') then
         return {
             redirect_to = request:url_for("download_pasta", {
                 token = request.params.token,

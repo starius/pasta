@@ -80,7 +80,7 @@ local function rawPasta(request)
             }),
         }
     end
-    request.res.headers["Content-Type"] = "text/plain"
+    request.res.headers["Content-Type"] = "text/plain; charset=utf-8"
     return {layout = false, render = require "pasta.views.raw_pasta"}
 end
 

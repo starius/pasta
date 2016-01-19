@@ -13,6 +13,7 @@ config({"development", "production"}, {
     hash_secret2 = 'hash_secret2',
     nwords_short = 3,
     nwords_long = 9,
+    max_pasta_size = 10000000,
 })
 
 config("production", {

@@ -47,6 +47,9 @@ app:get("index", "/", function()
 end)
 
 app:post("create", "/create", function(request)
+    if #request.params.filename > config.max_filename then
+        return "Filename is too long. Max " .. config.max_filename
+    end
     local token = findFreeToken(config.nwords_short)
     if not token then
         return "No free tokens available"

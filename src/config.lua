@@ -14,6 +14,7 @@ config({"development", "production"}, {
     nwords_short = 3,
     nwords_long = 9,
     max_pasta_size = 10000000,
+    max_filename = 150,
 })
 
 config("production", {

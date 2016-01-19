@@ -10,6 +10,21 @@ do
   local _base_0 = {
     content = function(self)
       h1("Pasta " .. self.token)
+      a({
+        href = self:url_for('raw_pasta', {
+          token = self.token
+        })
+      }, function()
+        return text('raw')
+      end)
+      text(' / ')
+      a({
+        href = self:url_for('download_pasta', {
+          token = self.token
+        })
+      }, function()
+        return text('download')
+      end)
       return pre(function()
         return raw(escape(self.p_content))
       end)

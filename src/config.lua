@@ -20,4 +20,9 @@ config({"development", "production"}, {
 config("production", {
     code_cache = 'on',
     logging = {queries = false, requests = false},
+    print_stack_to_browser = false,
+})
+
+config("development", {
+    print_stack_to_browser = true,
 })

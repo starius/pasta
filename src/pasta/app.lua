@@ -1,6 +1,7 @@
 local mnemonic = require("mnemonic")
 local arc4random = require("arc4random")
 local crypto = require("crypto")
+local ngx = require("ngx")
 local lapis = require("lapis")
 local urldecode = require("lapis.util").unescape
 local model = require("pasta.models")
@@ -8,6 +9,13 @@ local config = require("lapis.config").get()
 local app = lapis.Application()
 
 app.layout = require("pasta.views.layout")
+
+if not config.print_stack_to_browser then
+    -- http://leafo.net/lapis/reference/actions.html
+    app.handle_error = function(self, _, _)
+        ngx.say("There was an error...")
+    end
+end
 
 local function makeToken(nwords)
     local words = mnemonic.randomWords(nwords, arc4random.random)

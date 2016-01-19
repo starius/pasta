@@ -107,6 +107,7 @@ end
 
 app:get("raw_pasta0", "/:token/raw", rawPasta)
 app:get("raw_pasta", "/:token/raw/:filename", rawPasta)
+-- http://stackoverflow.com/a/216777
 
 local function downloadPasta(request)
     loadPaste(request)

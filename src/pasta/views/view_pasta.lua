@@ -9,7 +9,9 @@ do
   local _parent_0 = Widget
   local _base_0 = {
     content = function(self)
-      p("File " .. tostring(self.p_filename))
+      if #self.p_filename > 0 then
+        p("File " .. tostring(self.p_filename))
+      end
       a({
         href = self:url_for('index')
       }, function()

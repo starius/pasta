@@ -2,7 +2,8 @@ import Widget, escape from require "lapis.html"
 
 class ViewPasta extends Widget
   content: =>
-    p "File #{@p_filename}"
+    if #@p_filename > 0
+      p "File #{@p_filename}"
     a href: @url_for('index'), ->
       text 'new'
     text ' / '

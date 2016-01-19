@@ -6,6 +6,8 @@ local model = require("pasta.models")
 local config = require("lapis.config").get()
 local app = lapis.Application()
 
+app.layout = require("pasta.views.layout")
+
 local function makeToken(nwords)
     local words = mnemonic.randomWords(nwords, arc4random.random)
     return table.concat(words, '-')

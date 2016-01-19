@@ -1,28 +1,36 @@
-local Widget
-Widget = require("lapis.html").Widget
-local config = require("lapis.config").get()
-local Index
+local html = require("lapis.html")
 do
   local _class_0
-  local _parent_0 = Widget
+  local _parent_0 = html.Widget
   local _base_0 = {
     content = function(self)
-      return form({
-        method = "POST",
-        action = self:url_for("create")
-      }, function()
-        textarea({
-          name = "content",
-          cols = 80,
-          rows = 24
-        })
-        br()
-        text("Max size: " .. tostring(config.max_pasta_size) .. " bytes")
-        br()
-        return input({
-          type = "submit",
-          value = "Upload"
-        })
+      return html_5(function()
+        head(function()
+          meta({
+            charset = 'utf-8'
+          })
+          return title("Pasta")
+        end)
+        return body(function()
+          if self.token then
+            h1("Pasta " .. self.token)
+          else
+            h1("Pasta")
+          end
+          self:content_for("inner")
+          br()
+          a({
+            href = "http://github.com/starius/pasta"
+          }, function()
+            return text("The source")
+          end)
+          text(" of the site is under ")
+          return a({
+            href = "https://github.com/starius/pasta/blob/master/LICENSE"
+          }, function()
+            return text("the MIT license")
+          end)
+        end)
       end)
     end
   }
@@ -33,7 +41,7 @@ do
       return _class_0.__parent.__init(self, ...)
     end,
     __base = _base_0,
-    __name = "Index",
+    __name = nil,
     __parent = _parent_0
   }, {
     __index = function(cls, name)
@@ -57,6 +65,5 @@ do
   if _parent_0.__inherited then
     _parent_0.__inherited(_parent_0, _class_0)
   end
-  Index = _class_0
   return _class_0
 end

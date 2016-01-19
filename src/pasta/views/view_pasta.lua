@@ -9,7 +9,6 @@ do
   local _parent_0 = Widget
   local _base_0 = {
     content = function(self)
-      h1("Pasta " .. self.token)
       p("File " .. tostring(self.p_filename))
       a({
         href = self:url_for('raw_pasta', {

@@ -32,6 +32,7 @@ do
         br()
         text("Max size: " .. tostring(config.max_pasta_size) .. " bytes")
         br()
+        br()
         return input({
           type = "submit",
           value = "Upload"

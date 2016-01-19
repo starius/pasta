@@ -11,4 +11,5 @@ class Index extends Widget
       br!
       text "Max size: #{config.max_pasta_size} bytes"
       br!
+      br!
       input type: "submit", value: "Upload"

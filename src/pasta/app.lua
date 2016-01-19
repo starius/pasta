@@ -2,6 +2,7 @@ local mnemonic = require("mnemonic")
 local arc4random = require("arc4random")
 local crypto = require("crypto")
 local lapis = require("lapis")
+local urldecode = require("lapis.util").unescape
 local model = require("pasta.models")
 local config = require("lapis.config").get()
 local app = lapis.Application()
@@ -53,7 +54,7 @@ app:post("create", "/create", function(request)
     local p = model.Pasta:create {
         hash = makeHash(token),
         self_burning = false,
-        filename = 'TODO.txt',
+        filename = request.params.filename,
         content = request.params.content,
         password = 'TODO',
     }
@@ -71,7 +72,7 @@ end)
 
 local function rawPasta(request)
     loadPaste(request)
-    if request.p.filename ~= request.params.filename then
+    if request.p.filename ~= urldecode(request.params.filename) then
         return {
             redirect_to = request:url_for("raw_pasta", {
                 token = request.params.token,
@@ -88,7 +89,7 @@ app:get("raw_pasta", "/:token/raw/:filename", rawPasta)
 
 local function downloadPasta(request)
     loadPaste(request)
-    if request.p.filename ~= request.params.filename then
+    if request.p.filename ~= urldecode(request.params.filename) then
         return {
             redirect_to = request:url_for("download_pasta", {
                 token = request.params.token,

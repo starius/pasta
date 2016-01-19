@@ -11,6 +11,19 @@ do
         method = "POST",
         action = self:url_for("create")
       }, function()
+        element("table", function()
+          return tr(function()
+            td(function()
+              return input({
+                name = "filename",
+                size = 20
+              })
+            end)
+            return td(function()
+              return p("File name")
+            end)
+          end)
+        end)
         textarea({
           name = "content",
           cols = 80,

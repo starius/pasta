@@ -1,8 +1,5 @@
-local Widget, escape
-do
-  local _obj_0 = require("lapis.html")
-  Widget, escape = _obj_0.Widget, _obj_0.escape
-end
+local Widget
+Widget = require("lapis.html").Widget
 local RawPasta
 do
   local _class_0

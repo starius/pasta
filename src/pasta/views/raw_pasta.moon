@@ -1,4 +1,4 @@
-import Widget, escape from require "lapis.html"
+import Widget from require "lapis.html"
 
 class RawPasta extends Widget
   content: =>

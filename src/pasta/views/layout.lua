@@ -17,6 +17,15 @@ do
           else
             h1("Pasta")
           end
+          if not self.no_new_pasta then
+            p(function()
+              return a({
+                href = self:url_for('index')
+              }, function()
+                return text('create new')
+              end)
+            end)
+          end
           self:content_for("inner")
           br()
           br()

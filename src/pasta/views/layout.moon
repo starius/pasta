@@ -11,6 +11,9 @@ class extends html.Widget
           h1 "Pasta " .. @token
         else
           h1 "Pasta"
+        if not @no_new_pasta
+          p -> a href: @url_for('index'), ->
+            text 'create new'
         @content_for "inner"
         br!
         br!

@@ -52,7 +52,8 @@ app:get("schema", "/schema", function()
     model.create_schema()
 end)
 
-app:get("index", "/", function()
+app:get("index", "/", function(request)
+    request.no_new_pasta = true
     return {render = true}
 end)
 
@@ -83,6 +84,7 @@ app:get("view_pasta", "/:token", function(request)
     if not request.p then
         return "No such pasta"
     end
+    request.no_new_pasta = true
     return {render = true}
 end)
 

@@ -39,8 +39,8 @@ end
 
 local function loadPaste(request)
     request.token = request.params.token
-    request.hash = makeHash(request.token)
-    request.p = model.Pasta:find(request.hash)
+    local hash = makeHash(request.token)
+    request.p = model.Pasta:find(hash)
     assert(request.p, "No such pasta")
     request.p_content = request.p.content
     request.p_filename = request.p.filename

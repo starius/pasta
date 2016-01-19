@@ -42,9 +42,10 @@ local function loadPaste(request)
     request.token = request.params.token
     local hash = makeHash(request.token)
     request.p = model.Pasta:find(hash)
-    assert(request.p, "No such pasta")
-    request.p_content = request.p.content
-    request.p_filename = request.p.filename
+    if request.p then
+        request.p_content = request.p.content
+        request.p_filename = request.p.filename
+    end
 end
 
 app:get("schema", "/schema", function()
@@ -79,11 +80,17 @@ end)
 
 app:get("view_pasta", "/:token", function(request)
     loadPaste(request)
+    if not request.p then
+        return "No such pasta"
+    end
     return {render = true}
 end)
 
 local function rawPasta(request)
     loadPaste(request)
+    if not request.p then
+        return "No such pasta"
+    end
     if request.p.filename ~= urldecode(request.params.filename or '') then
         return {
             redirect_to = request:url_for("raw_pasta", {
@@ -101,6 +108,9 @@ app:get("raw_pasta", "/:token/raw/:filename", rawPasta)
 
 local function downloadPasta(request)
     loadPaste(request)
+    if not request.p then
+        return "No such pasta"
+    end
     if request.p.filename ~= urldecode(request.params.filename or '') then
         return {
             redirect_to = request:url_for("download_pasta", {

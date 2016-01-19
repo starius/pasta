@@ -32,6 +32,7 @@ local function loadPaste(request)
     request.p = model.Pasta:find(request.hash)
     assert(request.p, "No such pasta")
     request.p_content = request.p.content
+    request.p_filename = request.p.filename
 end
 
 app:get("schema", "/schema", function()

@@ -12,7 +12,8 @@ do
       p("File " .. tostring(self.p_filename))
       a({
         href = self:url_for('raw_pasta', {
-          token = self.token
+          token = self.token,
+          filename = self.p_filename
         })
       }, function()
         return text('raw')
@@ -20,7 +21,8 @@ do
       text(' / ')
       a({
         href = self:url_for('download_pasta', {
-          token = self.token
+          token = self.token,
+          filename = self.p_filename
         })
       }, function()
         return text('download')

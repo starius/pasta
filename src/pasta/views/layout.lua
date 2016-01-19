@@ -19,6 +19,7 @@ do
           end
           self:content_for("inner")
           br()
+          br()
           a({
             href = "http://github.com/starius/pasta"
           }, function()

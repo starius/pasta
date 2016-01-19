@@ -13,6 +13,7 @@ class extends html.Widget
           h1 "Pasta"
         @content_for "inner"
         br!
+        br!
         a href: "http://github.com/starius/pasta", ->
           text "The source"
         text " of the site is under "

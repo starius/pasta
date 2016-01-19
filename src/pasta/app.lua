@@ -69,28 +69,22 @@ app:get("view_pasta", "/:token", function(request)
     return {render = require "pasta.views.view_pasta"}
 end)
 
-app:get("raw_pasta0", "/:token/raw", function(request)
+local function rawPasta(request)
     loadPaste(request)
     request.res.headers["Content-Type"] = "text/plain"
     return {layout = false, render = require "pasta.views.raw_pasta"}
-end)
+end
 
-app:get("raw_pasta", "/:token/raw/:filename", function(request)
-    loadPaste(request)
-    request.res.headers["Content-Type"] = "text/plain"
-    return {layout = false, render = require "pasta.views.raw_pasta"}
-end)
+app:get("raw_pasta0", "/:token/raw", rawPasta)
+app:get("raw_pasta", "/:token/raw/:filename", rawPasta)
 
-app:get("download_pasta0", "/:token/download", function(request)
+local function downloadPasta(request)
     loadPaste(request)
     request.res.headers["Content-Type"] = "application/octet-stream"
     return {layout = false, render = require "pasta.views.raw_pasta"}
-end)
+end
 
-app:get("download_pasta", "/:token/download/:filename", function(request)
-    loadPaste(request)
-    request.res.headers["Content-Type"] = "application/octet-stream"
-    return {layout = false, render = require "pasta.views.raw_pasta"}
-end)
+app:get("download_pasta0", "/:token/download", downloadPasta)
+app:get("download_pasta", "/:token/download/:filename", downloadPasta)
 
 return app

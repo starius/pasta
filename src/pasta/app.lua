@@ -71,6 +71,14 @@ end)
 
 local function rawPasta(request)
     loadPaste(request)
+    if request.p.filename ~= request.params.filename then
+        return {
+            redirect_to = request:url_for("raw_pasta", {
+                token = request.params.token,
+                filename = request.p.filename,
+            }),
+        }
+    end
     request.res.headers["Content-Type"] = "text/plain"
     return {layout = false, render = require "pasta.views.raw_pasta"}
 end
@@ -80,6 +88,14 @@ app:get("raw_pasta", "/:token/raw/:filename", rawPasta)
 
 local function downloadPasta(request)
     loadPaste(request)
+    if request.p.filename ~= request.params.filename then
+        return {
+            redirect_to = request:url_for("download_pasta", {
+                token = request.params.token,
+                filename = request.p.filename,
+            }),
+        }
+    end
     request.res.headers["Content-Type"] = "application/octet-stream"
     return {layout = false, render = require "pasta.views.raw_pasta"}
 end

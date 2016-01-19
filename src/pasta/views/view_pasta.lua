@@ -11,6 +11,12 @@ do
     content = function(self)
       p("File " .. tostring(self.p_filename))
       a({
+        href = self:url_for('index')
+      }, function()
+        return text('new')
+      end)
+      text(' / ')
+      a({
         href = self:url_for('raw_pasta', {
           token = self.token,
           filename = self.p_filename

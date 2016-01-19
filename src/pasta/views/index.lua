@@ -1,5 +1,6 @@
 local Widget
 Widget = require("lapis.html").Widget
+local config = require("lapis.config").get()
 local Index
 do
   local _class_0
@@ -16,6 +17,8 @@ do
           cols = 80,
           rows = 24
         })
+        br()
+        text("Max size: " .. tostring(config.max_pasta_size) .. " bytes")
         br()
         return input({
           type = "submit",

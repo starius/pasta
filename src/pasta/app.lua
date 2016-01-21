@@ -1,6 +1,7 @@
 local mnemonic = require("mnemonic")
 local arc4random = require("arc4random")
 local crypto = require("crypto")
+local lru = require("lru")
 local ngx = require("ngx")
 local lapis = require("lapis")
 local urldecode = require("lapis.util").unescape
@@ -10,6 +11,8 @@ local app = lapis.Application()
 
 app.layout = require("pasta.views.layout")
 app.views_prefix = "pasta.views"
+
+local cache = lru.new(config.cache_nrecords, cache_nbytes)
 
 if not config.print_stack_to_browser then
     -- http://leafo.net/lapis/reference/actions.html
@@ -40,8 +43,14 @@ end
 
 local function loadPaste(request)
     request.token = request.params.token
-    local hash = makeHash(request.token)
-    request.p = model.Pasta:find(hash)
+    request.p = cache:get(request.token)
+    if not request.p then
+        local hash = makeHash(request.token)
+        request.p = model.Pasta:find(hash)
+        if request.p then
+            cache:set(request.token, request.p, #request.p.content)
+        end
+    end
     if request.p then
         request.p_content = request.p.content
         request.p_filename = request.p.filename
@@ -75,6 +84,7 @@ app:post("create", "/create", function(request)
     if not p then
         return "Failed to create paste"
     end
+    cache:set(token, p, #p.content)
     local url = request:url_for("view_pasta", {token=token})
     return {redirect_to = url}
 end)

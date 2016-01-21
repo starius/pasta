@@ -15,14 +15,16 @@ config({"development", "production"}, {
     nwords_long = 9,
     max_pasta_size = 10000000,
     max_filename = 150,
-    cache_nrecords = 1000,
-    cache_nbytes = 100000000,
 })
 
 config("production", {
     code_cache = 'on',
     logging = {queries = false, requests = false},
     print_stack_to_browser = false,
+    pastas_cache = {
+        nrecords = 1000,
+        nbytes = 100000000,
+    },
 })
 
 config("development", {

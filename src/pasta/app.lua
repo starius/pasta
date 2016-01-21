@@ -12,7 +12,13 @@ local app = lapis.Application()
 app.layout = require("pasta.views.layout")
 app.views_prefix = "pasta.views"
 
-local cache = lru.new(config.cache_nrecords, cache_nbytes)
+local cache
+if config.pastas_cache then
+    cache = lru.new(
+        config.pastas_cache.nrecords,
+        config.pastas_cache.nbytes
+    )
+end
 
 if not config.print_stack_to_browser then
     -- http://leafo.net/lapis/reference/actions.html
@@ -43,11 +49,11 @@ end
 
 local function loadPaste(request)
     request.token = request.params.token
-    request.p = cache:get(request.token)
+    request.p = cache and cache:get(request.token)
     if not request.p then
         local hash = makeHash(request.token)
         request.p = model.Pasta:find(hash)
-        if request.p then
+        if request.p and cache then
             cache:set(request.token, request.p, #request.p.content)
         end
     end
@@ -84,7 +90,9 @@ app:post("create", "/create", function(request)
     if not p then
         return "Failed to create paste"
     end
-    cache:set(token, p, #p.content)
+    if cache then
+        cache:set(token, p, #p.content)
+    end
     local url = request:url_for("view_pasta", {token=token})
     return {redirect_to = url}
 end)

@@ -21,7 +21,7 @@ do
               })
             end)
             return td(function()
-              return p("File name")
+              return p("File name (optional)")
             end)
           end)
         end)

@@ -6,7 +6,10 @@ do
   local _parent_0 = Widget
   local _base_0 = {
     content = function(self)
-      p("Password: " .. tostring(self.password_plain))
+      p(function()
+        text("Password: ")
+        return b(self.password_plain)
+      end)
       p(function()
         return font({
           color = "red"

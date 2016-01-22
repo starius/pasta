@@ -31,6 +31,14 @@ class Index extends Widget
         value: "editable"
       }
       label for: 'pasta_type_editable', 'Editable pasta'
+      raw '&nbsp;'\rep 10
+      input {
+        type: "radio"
+        name: "pasta_type"
+        id: "pasta_type_self_burning"
+        value: "self_burning"
+      }
+      label for: 'pasta_type_self_burning', 'Self-burning'
 
       br!
       br!

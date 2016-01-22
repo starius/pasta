@@ -56,6 +56,13 @@ local function findFreeToken(nwords)
     end
 end
 
+local function deletePasta(p, token)
+    p:delete()
+    if cache then
+        cache:delete(token)
+    end
+end
+
 local function loadPaste(request)
     request.token = request.params.token
     request.p = cache and cache:get(request.token)
@@ -69,6 +76,9 @@ local function loadPaste(request)
     if request.p then
         request.p_content = request.p.content
         request.p_filename = request.p.filename
+        if request.p.self_burning then
+            deletePasta(request.p, request.token)
+        end
     end
 end
 
@@ -91,22 +101,28 @@ app:post("create", "/pasta/create", function(request)
     if #request.params.filename > config.max_filename then
         return "Filename is too long. Max " .. config.max_filename
     end
-    local token = findFreeToken(config.nwords.short)
-    if not token then
-        return "No free tokens available"
-    end
     local password_hash
+    local self_burning = false
+    local nwords = config.nwords.short
     if request.params.pasta_type == 'standard' then
         password_hash = ''
     elseif request.params.pasta_type == 'editable' then
         request.password_plain = makePassword()
         password_hash = makePasswordHash(request.password_plain)
+    elseif request.params.pasta_type == 'self_burning' then
+        password_hash = ''
+        self_burning = true
+        nwords = config.nwords.long
     else
         return "Unknown pasta type"
     end
+    local token = findFreeToken(nwords)
+    if not token then
+        return "No free tokens available"
+    end
     local p = model.Pasta:create {
         hash = makeHash(token),
-        self_burning = false,
+        self_burning = self_burning,
         filename = request.params.filename,
         content = request.params.content,
         password = assert(password_hash),
@@ -124,6 +140,20 @@ app:post("create", "/pasta/create", function(request)
         request.no_new_pasta = true
         request.pasta_url = request:build_url(url)
         return {render = "show_password"}
+    elseif request.params.pasta_type == 'self_burning' then
+        request.no_new_pasta = true
+        request.pasta_url = request:build_url(url)
+        local raw_url = request:url_for("raw_pasta", {
+            token = token,
+            filename = request.params.filename,
+        })
+        request.pasta_url_raw = request:build_url(raw_url)
+        local download_url = request:url_for("download_pasta", {
+            token = token,
+            filename = request.params.filename,
+        })
+        request.pasta_url_download = request:build_url(download_url)
+        return {render = "show_self_burning"}
     end
 end)
 
@@ -237,10 +267,7 @@ app:post("remove2", "/:token/remove2", function(request)
     if makePasswordHash(request.params.password) ~= request.p.password then
         return "Wrong password"
     end
-    request.p:delete()
-    if cache then
-        cache:delete(request.token)
-    end
+    deletePasta(request.p, request.token)
     return {redirect_to = request:url_for("index")}
 end)
 

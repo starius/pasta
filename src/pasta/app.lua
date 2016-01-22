@@ -38,7 +38,7 @@ local function makeHash(token)
 end
 
 local function makePassword()
-    return makeToken(config.nwords_password)
+    return makeToken(config.nwords.password)
 end
 
 local function makePasswordHash(password)
@@ -91,7 +91,7 @@ app:post("create", "/pasta/create", function(request)
     if #request.params.filename > config.max_filename then
         return "Filename is too long. Max " .. config.max_filename
     end
-    local token = findFreeToken(config.nwords_short)
+    local token = findFreeToken(config.nwords.short)
     if not token then
         return "No free tokens available"
     end

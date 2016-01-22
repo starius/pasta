@@ -14,9 +14,11 @@ config({"development", "production"}, {
     hash_secret2 = 'hash_secret2',
     password_secret1 = 'password_secret1',
     password_secret2 = 'password_secret2',
-    nwords_password = 9,
-    nwords_short = 3,
-    nwords_long = 9,
+    nwords = {
+        short = 3,
+        long = 9,
+        password = 9,
+    },
     max_pasta_size = 10 * 1024^2,
     max_filename = 150,
 })

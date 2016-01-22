@@ -63,9 +63,11 @@ local function loadPaste(request)
     end
 end
 
-app:get("schema", "/pasta/schema", function()
-    model.create_schema()
-end)
+if config.add_schema_creation_url then
+    app:get("schema", "/pasta/schema", function()
+        model.create_schema()
+    end)
+end
 
 app:get("index", "/", function(request)
     request.no_new_pasta = true

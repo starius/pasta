@@ -1,6 +1,7 @@
 local config = require("lapis.config")
 
 config({"development", "production"}, {
+    secret = "change me",
     port = 25516,
     postgres = {
         backend = "pgmoon",

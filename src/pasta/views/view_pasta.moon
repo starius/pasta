@@ -14,6 +14,10 @@ class ViewPasta extends Widget
     text ' / '
     a href: @url_for('download_pasta', token: @token, filename: @p_filename), ->
       text 'download'
+    if @p.password != ''
+      text ' / '
+      a href: @url_for('edit', token: @token), ->
+        text 'edit'
     br!
     br!
     pre @p_content

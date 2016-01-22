@@ -34,6 +34,16 @@ do
       }, function()
         return text('download')
       end)
+      if self.p.password ~= '' then
+        text(' / ')
+        a({
+          href = self:url_for('edit', {
+            token = self.token
+          })
+        }, function()
+          return text('edit')
+        end)
+      end
       br()
       br()
       return pre(self.p_content)

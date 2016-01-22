@@ -173,4 +173,20 @@ end
 app:get("download_pasta0", "/:token/download", downloadPasta)
 app:get("download_pasta", "/:token/download/:filename", downloadPasta)
 
+app:get("edit", "/:token/edit", function(request)
+    loadPaste(request)
+    if not request.p then
+        return "No such pasta"
+    end
+    if request.p.password == '' then
+        return "The pasta is not editable"
+    end
+    request.no_new_pasta = true
+    return {render = true}
+end)
+
+app:post("edit2", "/:token/edit2", function(request)
+    -- TODO
+end)
+
 return app

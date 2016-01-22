@@ -37,6 +37,8 @@ do
       }, function()
         return text('download')
       end)
+      br()
+      br()
       return pre(function()
         return raw(escape(self.p_content))
       end)

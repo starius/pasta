@@ -63,7 +63,7 @@ local function loadPaste(request)
     end
 end
 
-app:get("schema", "/schema", function()
+app:get("schema", "/pasta/schema", function()
     model.create_schema()
 end)
 
@@ -72,7 +72,7 @@ app:get("index", "/", function(request)
     return {render = true}
 end)
 
-app:post("create", "/create", function(request)
+app:post("create", "/pasta/create", function(request)
     if #request.params.filename > config.max_filename then
         return "Filename is too long. Max " .. config.max_filename
     end

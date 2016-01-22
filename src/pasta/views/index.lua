@@ -34,6 +34,28 @@ do
         text("Max size: " .. tostring(filesize(config.max_pasta_size)) .. " bytes")
         br()
         br()
+        input({
+          type = "radio",
+          name = "pasta_type",
+          value = "standard",
+          id = "pasta_type_standard",
+          checked = true
+        })
+        label({
+          ["for"] = 'pasta_type_standard'
+        }, 'Standard pasta')
+        raw(('&nbsp;'):rep(10))
+        input({
+          type = "radio",
+          name = "pasta_type",
+          id = "pasta_type_editable",
+          value = "editable"
+        })
+        label({
+          ["for"] = 'pasta_type_editable'
+        }, 'Editable pasta')
+        br()
+        br()
         return input({
           type = "submit",
           value = "Upload"

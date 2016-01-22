@@ -12,6 +12,26 @@ class Index extends Widget
       textarea name: "content", cols: 80, rows: 24
       br!
       text "Max size: #{filesize(config.max_pasta_size)} bytes"
+
+      br!
+      br!
+      input {
+        type: "radio"
+        name: "pasta_type"
+        value: "standard"
+        id: "pasta_type_standard"
+        checked: true
+      }
+      label for: 'pasta_type_standard', 'Standard pasta'
+      raw '&nbsp;'\rep 10
+      input {
+        type: "radio"
+        name: "pasta_type"
+        id: "pasta_type_editable"
+        value: "editable"
+      }
+      label for: 'pasta_type_editable', 'Editable pasta'
+
       br!
       br!
       input type: "submit", value: "Upload"

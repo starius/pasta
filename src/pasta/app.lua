@@ -37,6 +37,15 @@ local function makeHash(token)
     return crypto.digest('SHA256', text)
 end
 
+local function makePassword()
+    return makeToken(config.nwords_password)
+end
+
+local function makePasswordHash(password)
+    local text = config.password_secret1 .. password .. config.password_secret2
+    return crypto.digest('SHA256', text)
+end
+
 local function findFreeToken(nwords)
     for i = nwords, nwords * 2 do
         local token = makeToken(i)
@@ -82,12 +91,21 @@ app:post("create", "/pasta/create", function(request)
     if not token then
         return "No free tokens available"
     end
+    local password_hash
+    if request.params.pasta_type == 'standard' then
+        password_hash = ''
+    elseif request.params.pasta_type == 'editable' then
+        request.password_plain = makePassword()
+        password_hash = makePasswordHash(request.password_plain)
+    else
+        return "Unknown pasta type"
+    end
     local p = model.Pasta:create {
         hash = makeHash(token),
         self_burning = false,
         filename = request.params.filename,
         content = request.params.content,
-        password = 'TODO',
+        password = assert(password_hash),
     }
     if not p then
         return "Failed to create paste"
@@ -96,7 +114,13 @@ app:post("create", "/pasta/create", function(request)
         cache:set(token, p, #p.content)
     end
     local url = request:url_for("view_pasta", {token=token})
-    return {redirect_to = url}
+    if request.params.pasta_type == 'standard' then
+        return {redirect_to = url}
+    elseif request.params.pasta_type == 'editable' then
+        request.no_new_pasta = true
+        request.pasta_url = request:build_url(url)
+        return {render = "show_password"}
+    end
 end)
 
 app:get("view_pasta", "/:token", function(request)

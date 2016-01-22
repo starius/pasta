@@ -8,7 +8,8 @@ Fields of model Pasta:
   * boolean self_burning
   * varchar filename
   * string content
-  * varchar password (used to delete or update)
+  * varchar password (used to delete or update; empty if not used or
+    sha256(config.password_secret1 .. token .. config.password_secret2))
 
 Filename and content of self-burning pastas are encrypted
 with lapis.encode_with_secret(text, token).

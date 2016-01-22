@@ -3,6 +3,7 @@ do
   local _obj_0 = require("lapis.html")
   Widget, escape = _obj_0.Widget, _obj_0.escape
 end
+local filesize = require("filesize")
 local ViewPasta
 do
   local _class_0
@@ -12,6 +13,7 @@ do
       if #self.p_filename > 0 then
         p("File " .. tostring(self.p_filename))
       end
+      p("Size " .. tostring(filesize(#self.p_content)))
       a({
         href = self:url_for('index')
       }, function()

@@ -214,4 +214,34 @@ app:post("edit2", "/:token/edit2", function(request)
     return {redirect_to = url}
 end)
 
+app:get("remove", "/:token/remove", function(request)
+    loadPaste(request)
+    if not request.p then
+        return "No such pasta"
+    end
+    if not isEditable(request.p) then
+        return "The pasta is not removable"
+    end
+    request.no_new_pasta = true
+    return {render = true}
+end)
+
+app:post("remove2", "/:token/remove2", function(request)
+    loadPaste(request)
+    if not request.p then
+        return "No such pasta"
+    end
+    if not isEditable(request.p) then
+        return "The pasta is not removable"
+    end
+    if makePasswordHash(request.params.password) ~= request.p.password then
+        return "Wrong password"
+    end
+    request.p:delete()
+    if cache then
+        cache:delete(request.token)
+    end
+    return {redirect_to = request:url_for("index")}
+end)
+
 return app

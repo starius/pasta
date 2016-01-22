@@ -43,6 +43,14 @@ do
         }, function()
           return text('edit')
         end)
+        text(' / ')
+        a({
+          href = self:url_for('remove', {
+            token = self.token
+          })
+        }, function()
+          return text('remove')
+        end)
       end
       br()
       br()

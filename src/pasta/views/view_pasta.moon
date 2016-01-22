@@ -18,6 +18,9 @@ class ViewPasta extends Widget
       text ' / '
       a href: @url_for('edit', token: @token), ->
         text 'edit'
+      text ' / '
+      a href: @url_for('remove', token: @token), ->
+        text 'remove'
     br!
     br!
     pre @p_content

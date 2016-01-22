@@ -72,6 +72,10 @@ local function loadPaste(request)
     end
 end
 
+local function isEditable(p)
+    return p.password ~= '' and not p.self_burning
+end
+
 if config.add_schema_creation_url then
     app:get("schema", "/pasta/schema", function()
         model.create_schema()
@@ -178,7 +182,7 @@ app:get("edit", "/:token/edit", function(request)
     if not request.p then
         return "No such pasta"
     end
-    if request.p.password == '' then
+    if not isEditable(request.p) then
         return "The pasta is not editable"
     end
     request.no_new_pasta = true
@@ -186,7 +190,28 @@ app:get("edit", "/:token/edit", function(request)
 end)
 
 app:post("edit2", "/:token/edit2", function(request)
-    -- TODO
+    loadPaste(request)
+    if not request.p then
+        return "No such pasta"
+    end
+    if not isEditable(request.p) then
+        return "The pasta is not editable"
+    end
+    if makePasswordHash(request.params.password) ~= request.p.password then
+        return "Wrong password"
+    end
+    if #request.params.filename > config.max_filename then
+        return "Filename is too long. Max " .. config.max_filename
+    end
+    request.p:update {
+        filename = request.params.filename,
+        content = request.params.content,
+    }
+    if cache then
+        cache:set(request.token, request.p, #request.p.content)
+    end
+    local url = request:url_for("view_pasta", {token=request.token})
+    return {redirect_to = url}
 end)
 
 return app

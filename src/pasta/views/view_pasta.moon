@@ -1,4 +1,4 @@
-import Widget, escape from require "lapis.html"
+import Widget from require "lapis.html"
 filesize = require "filesize"
 
 class ViewPasta extends Widget
@@ -16,5 +16,4 @@ class ViewPasta extends Widget
       text 'download'
     br!
     br!
-    pre ->
-      raw escape @p_content
+    pre @p_content

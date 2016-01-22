@@ -1,8 +1,5 @@
-local Widget, escape
-do
-  local _obj_0 = require("lapis.html")
-  Widget, escape = _obj_0.Widget, _obj_0.escape
-end
+local Widget
+Widget = require("lapis.html").Widget
 local filesize = require("filesize")
 local ViewPasta
 do
@@ -39,9 +36,7 @@ do
       end)
       br()
       br()
-      return pre(function()
-        return raw(escape(self.p_content))
-      end)
+      return pre(self.p_content)
     end
   }
   _base_0.__index = _base_0

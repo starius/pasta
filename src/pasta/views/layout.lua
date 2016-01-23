@@ -1,6 +1,25 @@
 local html = require("lapis.html")
 local filesize = require("filesize")
 local view = require("pasta.view")
+local css = [[body {
+  font: 15px/1.3 Arial, sans-serif;
+}
+
+table {
+  margin-top: 0.3em;
+  border-collapse: collapse;
+}
+
+th,td {
+  font-weight: normal;
+  padding: 0.5em;
+}
+
+h1, h2 {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+]]
 do
   local _class_0
   local _parent_0 = html.Widget
@@ -11,7 +30,8 @@ do
           meta({
             charset = 'utf-8'
           })
-          return title("Pasta")
+          title("Pasta")
+          return style(css)
         end)
         return body(function()
           if self.token then

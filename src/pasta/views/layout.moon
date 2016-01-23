@@ -3,12 +3,34 @@ filesize = require "filesize"
 
 view = require "pasta.view"
 
+css = [[
+body {
+  font: 15px/1.3 Arial, sans-serif;
+}
+
+table {
+  margin-top: 0.3em;
+  border-collapse: collapse;
+}
+
+th,td {
+  font-weight: normal;
+  padding: 0.5em;
+}
+
+h1, h2 {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+]]
+
 class extends html.Widget
   content: =>
     html_5 ->
       head ->
         meta charset: 'utf-8'
         title "Pasta"
+        style css
       body ->
         if @token
           h1 "Pasta " .. @token

@@ -29,9 +29,13 @@ if not config.print_stack_to_browser then
     end
 end
 
-local function makeToken(nwords)
+local function makeMnemonic(nwords)
     local words = mnemonic.randomWords(nwords, arc4random.random)
     return table.concat(words, '-')
+end
+
+local function makeToken(nwords)
+    return makeMnemonic(nwords)
 end
 
 local function makeHash(token)
@@ -40,7 +44,7 @@ local function makeHash(token)
 end
 
 local function makePassword()
-    return makeToken(config.nwords.password)
+    return makeMnemonic(config.nwords.password)
 end
 
 local function makePasswordHash(password)
@@ -49,7 +53,7 @@ local function makePasswordHash(password)
 end
 
 local function makeSalt()
-    return makeToken(config.nwords.salt)
+    return makeMnemonic(config.nwords.salt)
 end
 
 local function makeKey(salt, token)
@@ -58,7 +62,7 @@ end
 
 local function findFreeToken(nwords)
     for i = nwords, nwords * 2 do
-        local token = makeToken(i)
+        local token = makeMnemonic(i)
         local hash = makeHash(token)
         if not model.Pasta:find(hash) then
             return token

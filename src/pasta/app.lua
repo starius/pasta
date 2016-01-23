@@ -98,6 +98,8 @@ local function loadPaste(request)
             request.p_content = request.p.content
             request.p_filename = request.p.filename
         end
+    else
+        request.token = nil
     end
 end
 

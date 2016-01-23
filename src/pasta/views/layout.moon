@@ -42,10 +42,10 @@ class extends html.Widget
         @content_for "inner"
         br!
         br!
+        npastas = view.getNumberOfPastas()
+        text "Number of pastas: #{filesize(npastas, unix: true, base: 10)}. "
         a href: "http://github.com/starius/pasta", ->
           text "The source"
         text " of the site is under "
         a href: "https://github.com/starius/pasta/blob/master/LICENSE", ->
           text "the MIT license"
-        npastas = view.getNumberOfPastas()
-        p "Number of pastas: #{filesize(npastas, unix: true, base: 10)}"

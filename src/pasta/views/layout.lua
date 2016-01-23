@@ -51,22 +51,22 @@ do
           self:content_for("inner")
           br()
           br()
+          local npastas = view.getNumberOfPastas()
+          text("Number of pastas: " .. tostring(filesize(npastas, {
+            unix = true,
+            base = 10
+          })) .. ". ")
           a({
             href = "http://github.com/starius/pasta"
           }, function()
             return text("The source")
           end)
           text(" of the site is under ")
-          a({
+          return a({
             href = "https://github.com/starius/pasta/blob/master/LICENSE"
           }, function()
             return text("the MIT license")
           end)
-          local npastas = view.getNumberOfPastas()
-          return p("Number of pastas: " .. tostring(filesize(npastas, {
-            unix = true,
-            base = 10
-          })))
         end)
       end)
     end

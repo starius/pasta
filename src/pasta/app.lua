@@ -24,7 +24,7 @@ end
 
 if not config.print_stack_to_browser then
     -- http://leafo.net/lapis/reference/actions.html
-    app.handle_error = function(self, _, _)
+    app.handle_error = function(_, _, _)
         ngx.say("There was an error...")
     end
 end

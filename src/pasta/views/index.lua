@@ -31,7 +31,7 @@ do
           rows = 24
         })
         br()
-        text("Max size: " .. tostring(filesize(config.max_pasta_size)) .. " bytes")
+        text("Max size: " .. tostring(filesize(config.max_pasta_size)))
         br()
         br()
         input({

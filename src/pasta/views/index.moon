@@ -11,7 +11,7 @@ class Index extends Widget
         td -> p "File name (optional)"
       textarea name: "content", cols: 80, rows: 24
       br!
-      text "Max size: #{filesize(config.max_pasta_size)} bytes"
+      text "Max size: #{filesize(config.max_pasta_size)}"
 
       br!
       br!

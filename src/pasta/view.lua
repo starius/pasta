@@ -51,7 +51,7 @@ end
 
 local function findFreeToken(nwords)
     for i = nwords, nwords * 2 do
-        local token = makeMnemonic(i)
+        local token = makeToken(i)
         local hash = makeHash(token)
         if not model.Pasta:find(hash) then
             return token

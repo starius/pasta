@@ -114,6 +114,9 @@ function view.createPasta(request)
     if #request.params.filename > config.max_filename then
         return "Filename is too long. Max " .. config.max_filename
     end
+    if request.params.filename:match('/') then
+        return "Filename must not contain /"
+    end
     local password_hash
     local self_burning = false
     local nwords = config.nwords.short

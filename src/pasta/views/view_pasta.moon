@@ -8,12 +8,14 @@ class ViewPasta extends Widget
     p "Size #{filesize(#@p_content)}"
     a href: @url_for('index'), ->
       text 'new'
-    text ' / '
-    a href: @url_for('raw_pasta', token: @token, filename: @p_filename), ->
-      text 'raw'
-    text ' / '
-    a href: @url_for('download_pasta', token: @token, filename: @p_filename), ->
-      text 'download'
+    if not @p.self_burning
+      url_params = token: @token, filename: @p_filename
+      text ' / '
+      a href: @url_for('raw_pasta', url_params), ->
+        text 'raw'
+      text ' / '
+      a href: @url_for('download_pasta', url_params), ->
+        text 'download'
     if @p.password != ''
       text ' / '
       a href: @url_for('edit', token: @token), ->

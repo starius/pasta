@@ -16,24 +16,24 @@ do
       }, function()
         return text('new')
       end)
-      text(' / ')
-      a({
-        href = self:url_for('raw_pasta', {
+      if not self.p.self_burning then
+        local url_params = {
           token = self.token,
           filename = self.p_filename
-        })
-      }, function()
-        return text('raw')
-      end)
-      text(' / ')
-      a({
-        href = self:url_for('download_pasta', {
-          token = self.token,
-          filename = self.p_filename
-        })
-      }, function()
-        return text('download')
-      end)
+        }
+        text(' / ')
+        a({
+          href = self:url_for('raw_pasta', url_params)
+        }, function()
+          return text('raw')
+        end)
+        text(' / ')
+        a({
+          href = self:url_for('download_pasta', url_params)
+        }, function()
+          return text('download')
+        end)
+      end
       if self.p.password ~= '' then
         text(' / ')
         a({

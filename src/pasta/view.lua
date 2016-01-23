@@ -18,6 +18,8 @@ if config.pastas_cache then
     )
 end
 
+local number_of_pastas
+
 local function makeMnemonic(nwords)
     local words = mnemonic.randomWords(nwords, arc4random.random)
     return table.concat(words, '-')
@@ -63,6 +65,9 @@ local function deletePasta(p, token)
     p:delete()
     if cache then
         cache:delete(token)
+    end
+    if number_of_pastas then
+        number_of_pastas = number_of_pastas - 1
     end
 end
 
@@ -151,6 +156,9 @@ function view.createPasta(request)
     }
     if not p then
         return "Failed to create paste"
+    end
+    if number_of_pastas then
+        number_of_pastas = number_of_pastas + 1
     end
     if cache then
         cache:set(token, p, #p.content)
@@ -284,6 +292,13 @@ function view.removePasta2(request)
     end
     deletePasta(request.p, request.token)
     return {redirect_to = request:url_for("index")}
+end
+
+function view.getNumberOfPastas()
+    if not number_of_pastas then
+        number_of_pastas = model.Pasta:count()
+    end
+    return number_of_pastas
 end
 
 return view

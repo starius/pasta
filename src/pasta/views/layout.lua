@@ -1,4 +1,6 @@
 local html = require("lapis.html")
+local filesize = require("filesize")
+local view = require("pasta.view")
 do
   local _class_0
   local _parent_0 = html.Widget
@@ -35,11 +37,16 @@ do
             return text("The source")
           end)
           text(" of the site is under ")
-          return a({
+          a({
             href = "https://github.com/starius/pasta/blob/master/LICENSE"
           }, function()
             return text("the MIT license")
           end)
+          local npastas = view.getNumberOfPastas()
+          return p("Number of pastas: " .. tostring(filesize(npastas, {
+            unix = true,
+            base = 10
+          })))
         end)
       end)
     end

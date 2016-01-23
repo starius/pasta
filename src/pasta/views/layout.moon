@@ -1,4 +1,7 @@
 html = require "lapis.html"
+filesize = require "filesize"
+
+view = require "pasta.view"
 
 class extends html.Widget
   content: =>
@@ -22,3 +25,5 @@ class extends html.Widget
         text " of the site is under "
         a href: "https://github.com/starius/pasta/blob/master/LICENSE", ->
           text "the MIT license"
+        npastas = view.getNumberOfPastas()
+        p "Number of pastas: #{filesize(npastas, unix: true, base: 10)}"

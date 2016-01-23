@@ -16,7 +16,7 @@ dependencies = {
     "lua-mnemonic",
     "lxsh",
     "luacrypto",
-    "filesize",
+    "lua-filesize",
 }
 build = {
     type = "builtin",

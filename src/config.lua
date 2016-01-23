@@ -18,6 +18,7 @@ config({"development", "production"}, {
         short = 3,
         long = 9,
         password = 9,
+        salt = 9,
     },
     max_pasta_size = 10 * 1024^2,
     max_filename = 150,

@@ -5,6 +5,8 @@ local lru = require("lru")
 local ngx = require("ngx")
 local lapis = require("lapis")
 local urldecode = require("lapis.util").unescape
+local encode_with_secret = require("lapis.util.encoding").encode_with_secret
+local decode_with_secret = require("lapis.util.encoding").decode_with_secret
 local model = require("pasta.models")
 local config = require("lapis.config").get()
 local app = lapis.Application()
@@ -46,6 +48,14 @@ local function makePasswordHash(password)
     return crypto.digest('SHA256', text)
 end
 
+local function makeSalt()
+    return makeToken(config.nwords.salt)
+end
+
+local function makeKey(salt, token)
+    return salt .. "|" .. token
+end
+
 local function findFreeToken(nwords)
     for i = nwords, nwords * 2 do
         local token = makeToken(i)
@@ -74,10 +84,15 @@ local function loadPaste(request)
         end
     end
     if request.p then
-        request.p_content = request.p.content
-        request.p_filename = request.p.filename
         if request.p.self_burning then
+            local key = makeKey(request.p.salt, request.token)
+            local info = decode_with_secret(request.p.content, key)
+            request.p_content = info.content
+            request.p_filename = info.filename
             deletePasta(request.p, request.token)
+        else
+            request.p_content = request.p.content
+            request.p_filename = request.p.filename
         end
     end
 end
@@ -120,11 +135,25 @@ app:post("create", "/pasta/create", function(request)
     if not token then
         return "No free tokens available"
     end
+    local filename = request.params.filename
+    local content = request.params.content
+    local salt = ''
+    if request.params.pasta_type == 'self_burning' then
+        local info = {
+            filename = filename,
+            content = content,
+        }
+        filename = ''
+        salt = makeSalt()
+        local key = makeKey(salt, token)
+        content = encode_with_secret(info, key)
+    end
     local p = model.Pasta:create {
         hash = makeHash(token),
         self_burning = self_burning,
-        filename = request.params.filename,
-        content = request.params.content,
+        filename = filename,
+        salt = salt,
+        content = content,
         password = assert(password_hash),
     }
     if not p then
@@ -171,11 +200,11 @@ local function rawPasta(request)
     if not request.p then
         return "No such pasta"
     end
-    if request.p.filename ~= urldecode(request.params.filename or '') then
+    if request.p_filename ~= urldecode(request.params.filename or '') then
         return {
             redirect_to = request:url_for("raw_pasta", {
                 token = request.params.token,
-                filename = request.p.filename,
+                filename = request.p_filename,
             }),
         }
     end
@@ -192,11 +221,11 @@ local function downloadPasta(request)
     if not request.p then
         return "No such pasta"
     end
-    if request.p.filename ~= urldecode(request.params.filename or '') then
+    if request.p_filename ~= urldecode(request.params.filename or '') then
         return {
             redirect_to = request:url_for("download_pasta", {
                 token = request.params.token,
-                filename = request.p.filename,
+                filename = request.p_filename,
             }),
         }
     end

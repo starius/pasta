@@ -8,9 +8,9 @@ do
   local _base_0 = {
     content = function(self)
       if #self.p_filename > 0 then
-        p("File " .. tostring(self.p_filename))
+        text("File " .. tostring(self.p_filename) .. " / ")
       end
-      p("Size " .. tostring(filesize(#self.p_content)))
+      text("Size " .. tostring(filesize(#self.p_content)) .. " / ")
       a({
         href = self:url_for('index')
       }, function()

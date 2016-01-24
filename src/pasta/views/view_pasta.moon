@@ -4,8 +4,8 @@ filesize = require "filesize"
 class ViewPasta extends Widget
   content: =>
     if #@p_filename > 0
-      p "File #{@p_filename}"
-    p "Size #{filesize(#@p_content)}"
+      text "File #{@p_filename} / "
+    text "Size #{filesize(#@p_content)} / "
     a href: @url_for('index'), ->
       text 'new'
     if not @p.self_burning

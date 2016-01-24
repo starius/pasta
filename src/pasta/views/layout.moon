@@ -44,8 +44,17 @@ class extends html.Widget
         br!
         npastas = view.getNumberOfPastas()
         text "Number of pastas: #{filesize(npastas, unix: true, base: 10)}. "
+        text "Mirrors: "
+        a href: "https://pasta.cf", ->
+          text "pasta.cf"
+        text ", "
+        a href: "http://pastagdsp33j7aoq.onion", ->
+          text "pastagdsp33j7aoq.onion"
+        text "."
+        br!
         a href: "http://github.com/starius/pasta", ->
           text "The source"
         text " of the site is under "
         a href: "https://github.com/starius/pasta/blob/master/LICENSE", ->
           text "the MIT license"
+        text "."

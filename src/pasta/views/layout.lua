@@ -56,17 +56,32 @@ do
             unix = true,
             base = 10
           })) .. ". ")
+          text("Mirrors: ")
+          a({
+            href = "https://pasta.cf"
+          }, function()
+            return text("pasta.cf")
+          end)
+          text(", ")
+          a({
+            href = "http://pastagdsp33j7aoq.onion"
+          }, function()
+            return text("pastagdsp33j7aoq.onion")
+          end)
+          text(".")
+          br()
           a({
             href = "http://github.com/starius/pasta"
           }, function()
             return text("The source")
           end)
           text(" of the site is under ")
-          return a({
+          a({
             href = "https://github.com/starius/pasta/blob/master/LICENSE"
           }, function()
             return text("the MIT license")
           end)
+          return text(".")
         end)
       end)
     end

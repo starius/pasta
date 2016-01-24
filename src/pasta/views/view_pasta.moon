@@ -1,6 +1,8 @@
 import Widget from require "lapis.html"
 filesize = require "filesize"
 
+highlight = require "pasta.highlight"
+
 class ViewPasta extends Widget
   content: =>
     if #@p_filename > 0
@@ -25,4 +27,9 @@ class ViewPasta extends Widget
         text 'remove'
     br!
     br!
-    pre @p_content
+    if not @p.html
+      @p.html = highlight.highlight(@p_content, @p_filename)
+    if @p.html
+      raw @p.html
+    else
+      pre @p_content

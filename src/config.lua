@@ -22,6 +22,7 @@ config({"development", "production"}, {
     },
     max_pasta_size = 10 * 1024^2,
     max_filename = 150,
+    max_highlighted = 100000,
 })
 
 config("production", {

@@ -2,6 +2,7 @@ local Widget
 Widget = require("lapis.html").Widget
 local filesize = require("filesize")
 local highlight = require("pasta.highlight")
+local zip = require("pasta.zip")
 local ViewPasta
 do
   local _class_0
@@ -55,13 +56,16 @@ do
       end
       br()
       br()
-      if not self.p.html then
-        self.p.html = highlight.highlight(self.p_content, self.p_filename)
-      end
-      if self.p.html then
-        return raw(self.p.html)
+      if self.p.html_zipped then
+        return raw(zip.decompress(self.p.html_zipped))
       else
-        return pre(self.p_content)
+        local html = highlight.highlight(self.p_content, self.p_filename)
+        if html then
+          self.p.html_zipped = zip.compress(html)
+          return raw(html)
+        else
+          return pre(self.p_content)
+        end
       end
     end
   }

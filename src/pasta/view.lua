@@ -101,45 +101,35 @@ local function isEditable(p)
     return p.password ~= '' and not p.self_burning
 end
 
-function view.schema()
-    model.create_schema()
-end
-
-function view.index(request)
-    request.no_new_pasta = true
-    return {render = true}
-end
-
-function view.createPasta(request)
-    if #request.params.filename > config.max_filename then
-        return "Filename is too long. Max " .. config.max_filename
+local function makePasta(filename, content, pasta_type)
+    if #filename > config.max_filename then
+        return nil, "Filename is too long. Max " .. config.max_filename
     end
-    if request.params.filename:match('/') then
-        return "Filename must not contain /"
+    if filename:match('/') then
+        return nil, "Filename must not contain /"
     end
     local password_hash
     local self_burning = false
     local nwords = config.nwords.short
-    if request.params.pasta_type == 'standard' then
+    local password_plain
+    if pasta_type == 'standard' then
         password_hash = ''
-    elseif request.params.pasta_type == 'editable' then
-        request.password_plain = makePassword()
-        password_hash = makePasswordHash(request.password_plain)
-    elseif request.params.pasta_type == 'self_burning' then
+    elseif pasta_type == 'editable' then
+        password_plain = makePassword()
+        password_hash = makePasswordHash(password_plain)
+    elseif pasta_type == 'self_burning' then
         password_hash = ''
         self_burning = true
         nwords = config.nwords.long
     else
-        return "Unknown pasta type"
+        return nil, "Unknown pasta type"
     end
     local token = findFreeToken(nwords)
     if not token then
-        return "No free tokens available"
+        return nil, "No free tokens available"
     end
-    local filename = request.params.filename
-    local content = request.params.content
     local salt = ''
-    if request.params.pasta_type == 'self_burning' then
+    if pasta_type == 'self_burning' then
         local info = {
             filename = filename,
             content = content,
@@ -158,7 +148,7 @@ function view.createPasta(request)
         password = assert(password_hash),
     }
     if not p then
-        return "Failed to create paste"
+        return nil, "Failed to create paste"
     end
     if number_of_pastas then
         number_of_pastas = number_of_pastas + 1
@@ -166,23 +156,47 @@ function view.createPasta(request)
     if cache then
         cache:set(token, p, #p.content)
     end
-    local url = request:url_for("view_pasta", {token=token})
+    return {
+        token = token,
+        password_plain = password_plain,
+    }
+end
+
+function view.schema()
+    model.create_schema()
+end
+
+function view.index(request)
+    request.no_new_pasta = true
+    return {render = true}
+end
+
+function view.createPasta(request)
+    local pasta, err = makePasta(
+        request.params.filename,
+        request.params.content,
+        request.params.pasta_type
+    )
+    if not pasta then
+        return err
+    end
+    request.no_new_pasta = true
+    local url = request:url_for("view_pasta", {token=pasta.token})
     if request.params.pasta_type == 'standard' then
         return {redirect_to = url}
     elseif request.params.pasta_type == 'editable' then
-        request.no_new_pasta = true
         request.pasta_url = request:build_url(url)
+        request.password_plain = pasta.password_plain
         return {render = "show_password"}
     elseif request.params.pasta_type == 'self_burning' then
-        request.no_new_pasta = true
         request.pasta_url = request:build_url(url)
         local raw_url = request:url_for("raw_pasta", {
-            token = token,
+            token = pasta.token,
             filename = request.params.filename,
         })
         request.pasta_url_raw = request:build_url(raw_url)
         local download_url = request:url_for("download_pasta", {
-            token = token,
+            token = pasta.token,
             filename = request.params.filename,
         })
         request.pasta_url_download = request:build_url(download_url)

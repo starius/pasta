@@ -14,20 +14,26 @@ do
           return text(self.pasta_url)
         end)
       end)
+      local pasta = {
+        token = self.token,
+        filename = self.filename
+      }
+      local pasta_url_raw = self:build_url(self:url_for("raw_pasta", pasta))
       p(function()
         text("Raw: ")
         return a({
-          href = self.pasta_url_raw
+          href = pasta_url_raw
         }, function()
-          return text(self.pasta_url_raw)
+          return text(pasta_url_raw)
         end)
       end)
+      local pasta_url_download = self:build_url(self:url_for("download_pasta", pasta))
       p(function()
         text("Download: ")
         return a({
-          href = self.pasta_url_download
+          href = pasta_url_download
         }, function()
-          return text(self.pasta_url_download)
+          return text(pasta_url_download)
         end)
       end)
       return p(function()

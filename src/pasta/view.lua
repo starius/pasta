@@ -180,26 +180,17 @@ function view.createPasta(request)
     if not pasta then
         return err
     end
-    request.no_new_pasta = true
     local url = request:url_for("view_pasta", {token=pasta.token})
+    request.no_new_pasta = true
+    request.token = pasta.token
+    request.filename = request.params.filename
+    request.pasta_url = request:build_url(url)
     if request.params.pasta_type == 'standard' then
         return {redirect_to = url}
     elseif request.params.pasta_type == 'editable' then
-        request.pasta_url = request:build_url(url)
         request.password_plain = pasta.password_plain
         return {render = "show_password"}
     elseif request.params.pasta_type == 'self_burning' then
-        request.pasta_url = request:build_url(url)
-        local raw_url = request:url_for("raw_pasta", {
-            token = pasta.token,
-            filename = request.params.filename,
-        })
-        request.pasta_url_raw = request:build_url(raw_url)
-        local download_url = request:url_for("download_pasta", {
-            token = pasta.token,
-            filename = request.params.filename,
-        })
-        request.pasta_url_download = request:build_url(download_url)
         return {render = "show_self_burning"}
     end
 end

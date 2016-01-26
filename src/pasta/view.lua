@@ -206,8 +206,8 @@ end
 
 function view.apiCreatePasta(request)
     local pasta, err = makePasta(
-        request.params.filename,
-        request.params.content,
+        request.params.uploaded_file.filename,
+        request.params.uploaded_file.content,
         request.params.pasta_type
     )
     if not pasta then

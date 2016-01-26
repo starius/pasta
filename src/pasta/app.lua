@@ -22,6 +22,7 @@ end
 app:get("index", "/", view.index)
 
 app:post("create", "/pasta/create", view.createPasta)
+app:post("api_create", "/api/create", view.apiCreatePasta)
 
 app:get("view_pasta", "/:token", view.viewPasta)
 

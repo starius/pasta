@@ -195,6 +195,18 @@ function view.createPasta(request)
     end
 end
 
+function view.apiCreatePasta(request)
+    local pasta, err = makePasta(
+        request.params.filename,
+        request.params.content,
+        request.params.pasta_type
+    )
+    if not pasta then
+        return {json = {error = err}}
+    end
+    return {json = pasta}
+end
+
 function view.viewPasta(request)
     loadPaste(request)
     if not request.p then

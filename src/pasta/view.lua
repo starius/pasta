@@ -2,6 +2,7 @@ local mnemonic = require("mnemonic")
 local arc4random = require("arc4random")
 local crypto = require("crypto")
 local lru = require("lru")
+local yaml = require("yaml")
 local urldecode = require("lapis.util").unescape
 local encode_with_secret = require("lapis.util.encoding").encode_with_secret
 local decode_with_secret = require("lapis.util.encoding").decode_with_secret
@@ -19,6 +20,13 @@ if config.pastas_cache then
 end
 
 local number_of_pastas
+
+local function apiResponse(object)
+    return yaml.dump(object), {
+        content_type = 'application/yaml',
+        layout = false,
+    }
+end
 
 local function makeMnemonic(nwords)
     local words = mnemonic.randomWords(nwords, arc4random.random)
@@ -211,9 +219,9 @@ function view.apiCreatePasta(request)
         request.params.pasta_type
     )
     if not pasta then
-        return {json = {error = err}}
+        return apiResponse({error = err})
     end
-    return {json = pasta}
+    return apiResponse(pasta)
 end
 
 function view.viewPasta(request)

@@ -18,6 +18,7 @@ dependencies = {
     "luacrypto",
     "lua-filesize",
     "lualzo",
+    "yaml",
 }
 build = {
     type = "builtin",

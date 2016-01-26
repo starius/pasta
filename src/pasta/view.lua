@@ -102,6 +102,15 @@ local function isEditable(p)
 end
 
 local function makePasta(filename, content, pasta_type)
+    if type(filename) ~= 'string' then
+        return nil, "Filename must be a string"
+    end
+    if type(content) ~= 'string' then
+        return nil, "Content must be a string"
+    end
+    if type(pasta_type) ~= 'string' then
+        return nil, "pasta_type must be a string"
+    end
     if #filename > config.max_filename then
         return nil, "Filename is too long. Max " .. config.max_filename
     end

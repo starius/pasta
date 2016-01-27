@@ -4,6 +4,7 @@ local crypto = require("crypto")
 local lru = require("lru")
 local yaml = require("yaml")
 local urldecode = require("lapis.util").unescape
+local csrf = require("lapis.csrf")
 local encode_with_secret = require("lapis.util.encoding").encode_with_secret
 local decode_with_secret = require("lapis.util.encoding").decode_with_secret
 local model = require("pasta.models")
@@ -20,6 +21,8 @@ if config.pastas_cache then
 end
 
 local number_of_pastas
+
+local CSRF_KEY = "index-page"
 
 local function apiResponse(object)
     return yaml.dump(object), {
@@ -185,10 +188,15 @@ end
 
 function view.index(request)
     request.no_new_pasta = true
+    request.csrf_token = csrf.generate_token(request, CSRF_KEY)
     return {render = true}
 end
 
 function view.createPasta(request)
+    local csrf_ok, msg = csrf.validate_token(request, CSRF_KEY)
+    if not csrf_ok then
+        return msg
+    end
     local pasta, err = makePasta(
         request.params.filename,
         request.params.content,

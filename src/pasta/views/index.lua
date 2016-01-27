@@ -12,6 +12,11 @@ do
         method = "POST",
         action = self:url_for("create")
       }, function()
+        input({
+          type = "hidden",
+          name = "csrf_token",
+          value = self.csrf_token
+        })
         element("table", function()
           return tr(function()
             td(function()

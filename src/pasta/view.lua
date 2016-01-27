@@ -214,15 +214,15 @@ end
 
 function view.apiCreatePasta(request)
     local pasta, err = makePasta(
-        request.params.uploaded_file.filename,
-        request.params.uploaded_file.content,
+        request.params.filename,
+        request.params.content,
         request.params.pasta_type
     )
     if not pasta then
         return apiResponse({error = err})
     end
     local result = {password = pasta.password, token=pasta.token}
-    pasta.filename = request.params.uploaded_file.filename
+    pasta.filename = request.params.filename
     result.view = request:build_url(request:url_for("view_pasta", pasta))
     result.raw = request:build_url(request:url_for("raw_pasta", pasta))
     return apiResponse(result)

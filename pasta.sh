@@ -12,7 +12,8 @@ pasta_type="standard"
 curl \
     --silent \
     $server/api/create \
-    -F "uploaded_file=@$filename" \
+    -F "content=<$filename" \
+    -F "filename=$filename" \
     -F "pasta_type=$pasta_type" \
 | egrep '^(raw|view):' \
 | sort --reverse

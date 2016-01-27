@@ -12,7 +12,7 @@ filename=""
 content="-"
 pasta_type="standard"
 mask='^view:'
-server=http://127.0.0.1:25516
+server="https://pasta.cf"
 
 for o in "$@"; do
     case "$o" in
@@ -25,6 +25,10 @@ for o in "$@"; do
         --self-burning)
             pasta_type="self_burning"
             mask="^(raw|view):"
+        ;;
+
+        --local)
+            server="http://127.0.0.1:25516"
         ;;
 
         *)

@@ -214,7 +214,7 @@ end
 
 function view.apiCreatePasta(request)
     local pasta, err = makePasta(
-        request.params.filename,
+        request.params.filename or '',
         request.params.content,
         request.params.pasta_type
     )

@@ -1,19 +1,44 @@
 #!/bin/sh
 
-filename=/dev/stdin
-if [ ! -z "$1" ]; then
-    filename=$1
-fi
+# Usage:
+# pasta.sh file
+# pasta.sh file --password
+# pasta.sh file --self-burning
+# cat file | pasta.sh
+# cat file | pasta.sh --password
+# cat file | pasta.sh --self-burning
 
+filename=""
+content="-"
+pasta_type="standard"
+mask='^view:'
 server=http://127.0.0.1:25516
 
-pasta_type="standard"
+for o in "$@"; do
+    case "$o" in
+
+        --password)
+            pasta_type="editable"
+            mask="^(password|view):"
+        ;;
+
+        --self-burning)
+            pasta_type="self_burning"
+            mask="^(raw|view):"
+        ;;
+
+        *)
+            filename=$(basename "$o")
+            content="$o"
+        ;;
+    esac
+done
 
 curl \
     --silent \
     $server/api/create \
-    -F "content=<$filename" \
+    -F "content=<$content" \
     -F "filename=$filename" \
     -F "pasta_type=$pasta_type" \
-| egrep '^(raw|view):' \
+| egrep "$mask" \
 | sort --reverse

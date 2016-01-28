@@ -6,11 +6,6 @@ config = require("lapis.config").get!
 class Index extends Widget
   content: =>
     form method: "POST", action: @url_for("create"), ->
-      input {
-        type: "hidden"
-        name: "csrf_token"
-        value: @csrf_token
-      }
       element "table", -> tr ->
         td -> input name: "filename", size: 20
         td -> p "File name (optional)"

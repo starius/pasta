@@ -39,7 +39,7 @@ for o in "$@"; do
 done
 
 curl \
-    --silent \
+    --silent --show-error \
     $server/api/create \
     -F "content=<$content" \
     -F "filename=$filename" \

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -ue
+
 # Usage:
 # pasta.sh file
 # pasta.sh file --password
@@ -38,11 +40,12 @@ for o in "$@"; do
     esac
 done
 
-curl \
+response=$(curl \
     --silent --show-error \
     $server/api/create \
     -F "content=<$content" \
     -F "filename=$filename" \
-    -F "pasta_type=$pasta_type" \
+    -F "pasta_type=$pasta_type")
+echo "$response" \
 | egrep "$mask" \
 | sort --reverse

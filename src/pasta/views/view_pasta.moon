@@ -11,6 +11,10 @@ class ViewPasta extends Widget
     text "Size #{filesize(#@p_content)} / "
     a href: @url_for('index'), ->
       text 'new'
+    if @p.password == ''
+      text ' / '
+      a href: "https://git.io/vgyko", ->
+        text "uploader"
     if not @p.self_burning
       url_params = token: @token, filename: @p_filename
       text ' / '

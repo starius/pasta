@@ -18,6 +18,14 @@ do
       }, function()
         return text('new')
       end)
+      if self.p.password == '' then
+        text(' / ')
+        a({
+          href = "https://git.io/vgyko"
+        }, function()
+          return text("uploader")
+        end)
+      end
       if not self.p.self_burning then
         local url_params = {
           token = self.token,

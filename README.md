@@ -8,7 +8,8 @@
 4. Setup the database and change `pasta/src/config.lua`
 5. `cd pasta && sudo luarocks make`
 6. `cd pasta/src && lapis server`
-7. Open http://localhost:25516/pasta/schema to create the table.
+7. Open [localhost:25516/pasta/schema](http://localhost:25516/pasta/schema)
+   to create the table.
 
 If your Nginx has multiple workers, disable cache in `config.lua`.
 

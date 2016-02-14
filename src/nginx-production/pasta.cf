@@ -1,0 +1,43 @@
+# https://gist.github.com/calind/1281950
+# agent type detection, based on idea from from http://notnotmobile.appspot.com/
+map $http_user_agent $agent_type_phase1 {
+    default 'mobile';
+    '' 'unknown';
+    ~*iphone|ipod|blackberry|palm|windows\s+ce 'mobile';
+    ~*windows|linux|os\s+[x9]|solaris|bsd 'desktop';
+    ~*spider|crawl|slurp|bot|feedburner 'bot';
+}
+map $http_x_skyfire_phone $agent_type_phase2 {
+    default 'mobile';
+    '' $agent_type_phase1;
+}
+map $http_x_operamini_phone_ua $agent_type {
+    default 'mobile';
+    '' $agent_type_phase2;
+}
+
+server {
+    listen 0.0.0.0:443;
+    server_name .pasta.cf;
+
+    ssl on;
+    ssl_certificate /etc/nginx/ssl/pasta.crt;
+    ssl_certificate_key /etc/nginx/ssl/pasta.key;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubdomains";
+
+    include sites-available/pasta.cf.inc;
+}
+
+server {
+    listen 0.0.0.0:80;
+    server_name .pastagdsp33j7aoq.onion;
+
+    include sites-available/pasta.cf.inc;
+}
+
+server {
+    listen 0.0.0.0:80;
+    server_name .pasta.cf;
+
+    return 301 https://pasta.cf$request_uri;
+}

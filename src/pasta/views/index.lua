@@ -64,8 +64,9 @@ do
         }, 'Editable pasta')
         if ngx.var.agent_type == 'mobile' then
           br()
+        else
+          raw(('&nbsp;'):rep(10))
         end
-        raw(('&nbsp;'):rep(10))
         input({
           type = "radio",
           name = "pasta_type",

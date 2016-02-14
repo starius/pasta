@@ -25,16 +25,18 @@ do
             end)
           end)
         end)
-        local cols
+        local cols, rows
         if ngx.var.agent_type == 'mobile' then
           cols = 45
+          rows = 20
         else
           cols = 80
+          rows = 24
         end
         textarea({
           name = "content",
           cols = cols,
-          rows = 24
+          rows = rows
         })
         br()
         text("Max size: " .. tostring(filesize(config.max_pasta_size)))

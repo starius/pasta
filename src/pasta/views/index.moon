@@ -9,11 +9,14 @@ class Index extends Widget
       element "table", -> tr ->
         td -> input name: "filename", size: 20
         td -> p "File name (optional)"
-      cols = if ngx.var.agent_type == 'mobile'
-          45
+      local cols, rows
+      if ngx.var.agent_type == 'mobile'
+          cols = 45
+          rows = 20
         else
-          80
-      textarea name: "content", cols: cols, rows: 24
+          cols = 80
+          rows = 24
+      textarea name: "content", cols: cols, rows: rows
       br!
       text "Max size: #{filesize(config.max_pasta_size)}"
 

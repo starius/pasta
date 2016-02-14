@@ -25,9 +25,15 @@ do
             end)
           end)
         end)
+        local cols
+        if ngx.var.agent_type == 'mobile' then
+          cols = 45
+        else
+          cols = 80
+        end
         textarea({
           name = "content",
-          cols = 80,
+          cols = cols,
           rows = 24
         })
         br()

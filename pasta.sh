@@ -40,6 +40,8 @@ for o in "$@"; do
     esac
 done
 
+mask="($mask)|(There was an error)"
+
 response=$(curl \
     --silent --show-error \
     $server/api/create \

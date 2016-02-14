@@ -40,8 +40,7 @@ class Index extends Widget
       label for: 'pasta_type_editable', 'Editable pasta'
       if ngx.var.agent_type == 'mobile'
         br!
-      else
-        raw '&nbsp;'\rep 10
+      raw '&nbsp;'\rep 10
       input {
         type: "radio"
         name: "pasta_type"

@@ -59,16 +59,6 @@ local function makeKey(salt, token)
     return salt .. "|" .. token
 end
 
-local function findFreeToken(nwords)
-    for i = nwords, nwords * 2 do
-        local token = makeToken(i)
-        local hash = makeHash(token)
-        if not model.Pasta:find(hash) then
-            return token
-        end
-    end
-end
-
 local function deletePasta(p, token)
     p:delete()
     if cache then
@@ -141,29 +131,38 @@ local function makePasta(filename, content, pasta_type)
     else
         return nil, "Unknown pasta type"
     end
-    local token = findFreeToken(nwords)
-    if not token then
+    -- try to find a free token
+    local p, token
+    for i = nwords, nwords * 2 do
+        token = makeToken(i)
+        local salt = ''
+        if pasta_type == 'self_burning' then
+            local info = {
+                filename = filename,
+                content = content,
+            }
+            filename = ''
+            salt = makeSalt()
+            local key = makeKey(salt, token)
+            content = encode_with_secret(info, key)
+        end
+        pcall(function()
+            p = model.Pasta:create {
+                hash = makeHash(token),
+                self_burning = self_burning,
+                filename = filename,
+                salt = salt,
+                content = content,
+                password = assert(password_hash),
+            }
+        end)
+        if p then
+            break
+        end
+    end
+    if not p then
         return nil, "No free tokens available"
     end
-    local salt = ''
-    if pasta_type == 'self_burning' then
-        local info = {
-            filename = filename,
-            content = content,
-        }
-        filename = ''
-        salt = makeSalt()
-        local key = makeKey(salt, token)
-        content = encode_with_secret(info, key)
-    end
-    local p = model.Pasta:create {
-        hash = makeHash(token),
-        self_burning = self_burning,
-        filename = filename,
-        salt = salt,
-        content = content,
-        password = assert(password_hash),
-    }
     if not p then
         return nil, "Failed to create paste"
     end

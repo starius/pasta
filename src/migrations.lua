@@ -1,3 +1,4 @@
+local db = require("lapis.db")
 local schema = require("lapis.db.schema")
 
 local migrations = {}
@@ -12,6 +13,10 @@ function migrations.rev_2016_01_16_init()
         {"password", schema.types.varchar},
     })
     schema.create_index("pasta", "hash")
+end
+
+function migrations.rev_2016_02_19_init()
+    db.query("ALTER TABLE pasta ADD PRIMARY KEY (hash);")
 end
 
 return migrations

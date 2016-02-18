@@ -7,9 +7,8 @@
 3. Install [LuaRocks](https://luarocks.org/)
 4. Setup the database and change `pasta/src/config.lua`
 5. `cd pasta && sudo luarocks make`
-6. `cd pasta/src && lapis server`
-7. Open [localhost:25516/pasta/schema](http://localhost:25516/pasta/schema)
-   to create the table.
+6. `cd pasta/src && lapis migrate`
+7. `cd pasta/src && lapis server`
 
 If your Nginx has multiple workers, disable cache in `config.lua`.
 

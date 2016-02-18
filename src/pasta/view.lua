@@ -179,10 +179,6 @@ local function makePasta(filename, content, pasta_type)
     }
 end
 
-function view.schema()
-    model.create_schema()
-end
-
 function view.index(request)
     request.no_new_pasta = true
     return {render = true}

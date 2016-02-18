@@ -37,5 +37,4 @@ config("production", {
 
 config("development", {
     print_stack_to_browser = true,
-    add_schema_creation_url = true,
 })

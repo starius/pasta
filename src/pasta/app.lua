@@ -15,10 +15,6 @@ if not config.print_stack_to_browser then
     end
 end
 
-if config.add_schema_creation_url then
-    app:get("schema", "/pasta/schema", view.schema)
-end
-
 app:get("index", "/", view.index)
 
 app:post("create", "/pasta/create", view.createPasta)

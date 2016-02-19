@@ -36,4 +36,7 @@ build = {
         ['pasta.views.raw_pasta'] = 'src/pasta/views/raw_pasta.lua',
         ['pasta.views.show_password'] = 'src/pasta/views/show_password.lua',
     },
+    copy_directories = {
+        'src/static',
+    },
 }

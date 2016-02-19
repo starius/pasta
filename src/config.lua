@@ -22,6 +22,7 @@ config({"development", "production"}, {
     },
     max_pasta_size = 10 * 1024^2,
     max_filename = 150,
+    highlight_js_path = '/static/highlight.js/9.1.0/',
 })
 
 config("production", {

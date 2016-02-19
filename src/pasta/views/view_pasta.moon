@@ -1,5 +1,12 @@
 import Widget from require "lapis.html"
 filesize = require "filesize"
+config = require("lapis.config").get!
+
+get_ext = (filename) ->
+  return nil unless filename
+  ext = filename\match '%.([^.]+)$'
+  if ext and #ext < 10
+    return ext
 
 class ViewPasta extends Widget
   content: =>
@@ -29,4 +36,11 @@ class ViewPasta extends Widget
         text 'remove'
     br!
     br!
-    pre @p_content
+    ext = get_ext(@p_filename)
+    pre ->
+      code {class: ext}, @p_content
+    if ext
+      base_path = config.highlight_js_path
+      link rel: 'stylesheet', href: base_path .. 'default.min.css'
+      script src: base_path .. 'highlight.min.js'
+      script 'hljs.initHighlightingOnLoad()'

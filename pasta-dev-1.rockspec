@@ -18,7 +18,6 @@ dependencies = {
     "lxsh",
     "luacrypto",
     "lua-filesize",
-    "lualzo",
     "yaml",
 }
 build = {
@@ -27,7 +26,6 @@ build = {
         ['pasta.app'] = 'src/pasta/app.lua',
         ['pasta.models'] = 'src/pasta/models.lua',
         ['pasta.highlight'] = 'src/pasta/highlight.lua',
-        ['pasta.zip'] = 'src/pasta/zip.lua',
         ['pasta.view'] = 'src/pasta/view.lua',
         ['pasta.views.layout'] = 'src/pasta/views/layout.lua',
         ['pasta.views.view_pasta'] = 'src/pasta/views/view_pasta.lua',

@@ -2,7 +2,6 @@ import Widget from require "lapis.html"
 filesize = require "filesize"
 
 highlight = require "pasta.highlight"
-zip = require "pasta.zip"
 
 class ViewPasta extends Widget
   content: =>
@@ -32,12 +31,9 @@ class ViewPasta extends Widget
         text 'remove'
     br!
     br!
-    if @p.html_zipped
-      raw zip.decompress(@p.html_zipped)
+    if not @p.html
+      @p.html = highlight.highlight(@p_content, @p_filename)
+    if @p.html
+      raw @p.html
     else
-      html = highlight.highlight(@p_content, @p_filename)
-      if html
-        @p.html_zipped = zip.compress(html)
-        raw html
-      else
-        pre @p_content
+      pre @p_content

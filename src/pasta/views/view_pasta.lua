@@ -1,7 +1,6 @@
 local Widget
 Widget = require("lapis.html").Widget
 local filesize = require("filesize")
-local highlight = require("pasta.highlight")
 local ViewPasta
 do
   local _class_0
@@ -63,14 +62,7 @@ do
       end
       br()
       br()
-      if not self.p.html then
-        self.p.html = highlight.highlight(self.p_content, self.p_filename)
-      end
-      if self.p.html then
-        return raw(self.p.html)
-      else
-        return pre(self.p_content)
-      end
+      return pre(self.p_content)
     end
   }
   _base_0.__index = _base_0

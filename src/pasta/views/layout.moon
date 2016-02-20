@@ -2,27 +2,7 @@ html = require "lapis.html"
 filesize = require "filesize"
 
 view = require "pasta.view"
-
-css = [[
-body {
-  font: 15px/1.3 Arial, sans-serif;
-}
-
-table {
-  margin-top: 0.3em;
-  border-collapse: collapse;
-}
-
-th,td {
-  font-weight: normal;
-  padding: 0.5em;
-}
-
-h1, h2 {
-  margin-top: 5px;
-  margin-bottom: 5px;
-}
-]]
+import main_css from require "pasta.blobs"
 
 class extends html.Widget
   content: =>
@@ -31,7 +11,7 @@ class extends html.Widget
         meta charset: 'utf-8'
         meta name: 'viewport', content: 'width=device-width, initial-scale=1'
         title "Pasta"
-        style css
+        style main_css
       body ->
         if @token
           h1 "Pasta " .. @token

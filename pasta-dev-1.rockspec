@@ -26,6 +26,7 @@ build = {
         ['pasta.app'] = 'src/pasta/app.lua',
         ['pasta.models'] = 'src/pasta/models.lua',
         ['pasta.view'] = 'src/pasta/view.lua',
+        ['pasta.blobs'] = 'src/pasta/blobs.lua',
         ['pasta.views.layout'] = 'src/pasta/views/layout.lua',
         ['pasta.views.view_pasta'] = 'src/pasta/views/view_pasta.lua',
         ['pasta.views.remove'] = 'src/pasta/views/remove.lua',

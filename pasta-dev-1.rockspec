@@ -15,7 +15,6 @@ dependencies = {
     "lua-lru",
     "arc4random",
     "lua-mnemonic",
-    "lxsh",
     "luacrypto",
     "lua-filesize",
     "yaml",

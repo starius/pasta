@@ -2,16 +2,6 @@ local Widget
 Widget = require("lapis.html").Widget
 local filesize = require("filesize")
 local config = require("lapis.config").get()
-local get_ext
-get_ext = function(filename)
-  if not (filename) then
-    return nil
-  end
-  local ext = filename:match('%.([^.]+)$')
-  if ext and #ext < 10 then
-    return ext
-  end
-end
 local ViewPasta
 do
   local _class_0
@@ -73,20 +63,14 @@ do
       end
       br()
       br()
-      local ext = get_ext(self.p_filename)
       pre(function()
         return code({
-          class = ext
+          class = self.ext
         }, self.p_content)
       end)
-      if ext then
-        local base_path = config.highlight_js_path
-        link({
-          rel = 'stylesheet',
-          href = base_path .. 'default.min.css'
-        })
+      if self.ext then
         script({
-          src = base_path .. 'highlight.min.js'
+          src = config.highlight_js_path .. 'highlight.min.js'
         })
         return script('hljs.initHighlightingOnLoad()')
       end

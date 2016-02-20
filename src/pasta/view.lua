@@ -178,6 +178,16 @@ local function makePasta(filename, content, pasta_type)
     }
 end
 
+local function getExt(filename)
+  if not filename then
+    return nil
+  end
+  local ext = filename:match('%.([^.]+)$')
+  if ext and #ext < 10 then
+    return ext
+  end
+end
+
 function view.index(request)
     request.no_new_pasta = true
     return {render = true}
@@ -229,6 +239,7 @@ function view.viewPasta(request)
         return "No such pasta"
     end
     request.no_new_pasta = true
+    request.ext = getExt(request.p_filename)
     return {render = true}
 end
 

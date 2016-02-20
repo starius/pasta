@@ -1,8 +1,11 @@
 local html = require("lapis.html")
 local filesize = require("filesize")
 local view = require("pasta.view")
-local main_css
-main_css = require("pasta.blobs").main_css
+local main_css, highlight_default
+do
+  local _obj_0 = require("pasta.blobs")
+  main_css, highlight_default = _obj_0.main_css, _obj_0.highlight_default
+end
 do
   local _class_0
   local _parent_0 = html.Widget
@@ -18,7 +21,10 @@ do
             content = 'width=device-width, initial-scale=1'
           })
           title("Pasta")
-          return style(main_css)
+          style(main_css)
+          if self.ext then
+            return style(highlight_default)
+          end
         end)
         return body(function()
           if self.token then

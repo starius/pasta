@@ -2,7 +2,7 @@ html = require "lapis.html"
 filesize = require "filesize"
 
 view = require "pasta.view"
-import main_css from require "pasta.blobs"
+import main_css, highlight_default from require "pasta.blobs"
 
 class extends html.Widget
   content: =>
@@ -12,6 +12,8 @@ class extends html.Widget
         meta name: 'viewport', content: 'width=device-width, initial-scale=1'
         title "Pasta"
         style main_css
+        if @ext -- highlight.js is used, embed CSS
+          style highlight_default
       body ->
         if @token
           h1 "Pasta " .. @token

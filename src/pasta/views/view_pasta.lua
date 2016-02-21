@@ -69,7 +69,7 @@ do
         }, self.p_content)
       end)
       script({
-        src = config.highlight_js_path .. 'highlight.min.js'
+        src = config.highlight_js_path .. 'highlight-custom.pack.js'
       })
       return script('hljs.initHighlightingOnLoad()')
     end

@@ -1,6 +1,7 @@
 import Widget from require "lapis.html"
 filesize = require "filesize"
 config = require("lapis.config").get!
+blobs = require "pasta.blobs"
 
 class ViewPasta extends Widget
   content: =>
@@ -32,5 +33,5 @@ class ViewPasta extends Widget
     br!
     pre ->
       code {class: @ext}, @p_content
-    script src: config.highlight_js_path .. 'highlight-custom.pack.js'
-    script 'hljs.initHighlightingOnLoad()'
+    script ->
+      raw blobs.apply_highlightjs

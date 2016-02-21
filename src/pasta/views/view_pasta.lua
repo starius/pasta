@@ -2,6 +2,7 @@ local Widget
 Widget = require("lapis.html").Widget
 local filesize = require("filesize")
 local config = require("lapis.config").get()
+local blobs = require("pasta.blobs")
 local ViewPasta
 do
   local _class_0
@@ -68,10 +69,9 @@ do
           class = self.ext
         }, self.p_content)
       end)
-      script({
-        src = config.highlight_js_path .. 'highlight-custom.pack.js'
-      })
-      return script('hljs.initHighlightingOnLoad()')
+      return script(function()
+        return raw(blobs.apply_highlightjs)
+      end)
     end
   }
   _base_0.__index = _base_0

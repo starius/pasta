@@ -32,6 +32,5 @@ class ViewPasta extends Widget
     br!
     pre ->
       code {class: @ext}, @p_content
-    if @ext
-      script src: config.highlight_js_path .. 'highlight.min.js'
-      script 'hljs.initHighlightingOnLoad()'
+    script src: config.highlight_js_path .. 'highlight.min.js'
+    script 'hljs.initHighlightingOnLoad()'

@@ -22,7 +22,7 @@ do
           })
           title("Pasta")
           style(main_css)
-          if self.ext then
+          if self.highlight_default_css then
             return style(highlight_default)
           end
         end)

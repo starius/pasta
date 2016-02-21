@@ -239,6 +239,7 @@ function view.viewPasta(request)
         return "No such pasta"
     end
     request.no_new_pasta = true
+    request.highlight_default_css = true
     request.ext = getExt(request.p_filename)
     return {render = true}
 end

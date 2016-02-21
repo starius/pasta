@@ -68,12 +68,10 @@ do
           class = self.ext
         }, self.p_content)
       end)
-      if self.ext then
-        script({
-          src = config.highlight_js_path .. 'highlight.min.js'
-        })
-        return script('hljs.initHighlightingOnLoad()')
-      end
+      script({
+        src = config.highlight_js_path .. 'highlight.min.js'
+      })
+      return script('hljs.initHighlightingOnLoad()')
     end
   }
   _base_0.__index = _base_0

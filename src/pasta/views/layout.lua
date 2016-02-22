@@ -69,7 +69,7 @@ do
           text(".")
           br()
           a({
-            href = "http://github.com/starius/pasta"
+            href = "https://github.com/starius/pasta"
           }, function()
             return text("The source")
           end)

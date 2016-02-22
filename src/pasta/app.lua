@@ -24,7 +24,7 @@ app:get("view_pasta", "/:token", view.viewPasta)
 
 app:get("raw_pasta0", "/:token/raw", view.rawPasta)
 app:get("raw_pasta", "/:token/raw/:filename", view.rawPasta)
--- http://stackoverflow.com/a/216777
+-- https://stackoverflow.com/a/216777
 
 app:get("download_pasta0", "/:token/download", view.downloadPasta)
 app:get("download_pasta", "/:token/download/:filename", view.downloadPasta)

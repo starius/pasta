@@ -37,7 +37,7 @@ class extends html.Widget
           text "pastagdsp33j7aoq.onion"
         text "."
         br!
-        a href: "http://github.com/starius/pasta", ->
+        a href: "https://github.com/starius/pasta", ->
           text "The source"
         text " of the site is under "
         a href: "https://github.com/starius/pasta/blob/master/LICENSE", ->

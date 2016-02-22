@@ -1,6 +1,6 @@
 --[[
 Pasta's token is a part of URL:
-http://pasta.cf/<token>
+https://pasta.cf/<token>
 
 See also src/migrations.lua
 

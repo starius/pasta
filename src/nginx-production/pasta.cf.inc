@@ -8,7 +8,7 @@ location /static/ {
 }
 
 location /favicon.ico {
-    alias static/pasta/favicon.ico;
+    alias /usr/local/lib/luarocks/rocks/pasta/dev-1/src/static/pasta/favicon.ico;
 }
 
 location / {

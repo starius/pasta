@@ -23,8 +23,13 @@ do
           title("Pasta")
           style(main_css)
           if self.highlight_default_css then
-            return style(highlight_default)
+            style(highlight_default)
           end
+          return link({
+            rel = "icon",
+            type = "image/x-icon",
+            href = "/favicon.ico"
+          })
         end)
         return body(function()
           if self.token then

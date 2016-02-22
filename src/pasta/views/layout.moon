@@ -15,6 +15,7 @@ class extends html.Widget
         if @highlight_default_css
           -- highlight.js is used, embed CSS
           style highlight_default
+        link rel: "icon", type: "image/x-icon", href: "/favicon.ico"
       body ->
         if @token
           h1 "Pasta " .. @token

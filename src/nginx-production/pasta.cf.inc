@@ -7,6 +7,10 @@ location /static/ {
     alias /usr/local/lib/luarocks/rocks/pasta/dev-1/src/static/;
 }
 
+location /favicon.ico {
+    alias static/pasta/favicon.ico;
+}
+
 location / {
     access_log off;
     error_log /dev/null crit;

@@ -33,5 +33,6 @@ class ViewPasta extends Widget
     br!
     pre ->
       code {class: @ext}, @p_content
-    script ->
-      raw blobs.apply_highlightjs
+    if @highlight
+      script ->
+        raw blobs.apply_highlightjs

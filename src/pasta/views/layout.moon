@@ -12,7 +12,7 @@ class extends html.Widget
         meta name: 'viewport', content: 'width=device-width, initial-scale=1'
         title "Pasta"
         style main_css
-        if @highlight_default_css
+        if @highlight
           -- highlight.js is used, embed CSS
           style highlight_default
         link rel: "icon", type: "image/x-icon", href: "/favicon.ico"

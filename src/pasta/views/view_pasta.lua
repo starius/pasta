@@ -69,9 +69,11 @@ do
           class = self.ext
         }, self.p_content)
       end)
-      return script(function()
-        return raw(blobs.apply_highlightjs)
-      end)
+      if self.highlight then
+        return script(function()
+          return raw(blobs.apply_highlightjs)
+        end)
+      end
     end
   }
   _base_0.__index = _base_0

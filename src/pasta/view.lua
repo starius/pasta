@@ -239,8 +239,10 @@ function view.viewPasta(request)
         return "No such pasta"
     end
     request.no_new_pasta = true
-    request.highlight_default_css = true
     request.ext = getExt(request.p_filename)
+    if request.ext ~= 'txt' or request.p_filename == 'CMakeLists.txt' then
+        request.highlight = true
+    end
     return {render = true}
 end
 

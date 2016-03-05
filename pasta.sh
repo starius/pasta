@@ -40,7 +40,7 @@ for o in "$@"; do
     esac
 done
 
-mask="($mask)|(There was an error)"
+mask="($mask)|(There was an error|Failed to create paste)"
 
 response=$(curl \
     --silent --show-error \

@@ -146,7 +146,7 @@ local function makePasta(filename, content, pasta_type)
             local key = makeKey(salt, token)
             content = encode_with_secret(info, key)
         end
-        pcall(function()
+        local _, msg = pcall(function()
             p = model.Pasta:create {
                 hash = makeHash(token),
                 self_burning = self_burning,
@@ -158,13 +158,12 @@ local function makePasta(filename, content, pasta_type)
         end)
         if p then
             break
+        elseif msg:match('invalid message format') then
+            return nil, "Failed to create paste"
         end
     end
     if not p then
         return nil, "No free tokens available"
-    end
-    if not p then
-        return nil, "Failed to create paste"
     end
     if number_of_pastas then
         number_of_pastas = number_of_pastas + 1

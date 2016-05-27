@@ -11,8 +11,11 @@ local view = require("pasta.view")
 if not config.print_stack_to_browser then
     -- http://leafo.net/lapis/reference/actions.html
     app.handle_error = function(_, _, _)
+        -- ngx.status should be set prior to ngx.say call
         ngx.status = ngx.HTTP_INTERNAL_SERVER_ERROR
         ngx.say("There was an error...")
+        -- ngx.exit is needed to prevent lapis layout
+        ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
     end
 end
 

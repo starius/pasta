@@ -17,6 +17,7 @@ do
             td(function()
               return input({
                 name = "password",
+                type = "password",
                 size = 20
               })
             end)

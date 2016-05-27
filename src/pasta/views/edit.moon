@@ -8,7 +8,7 @@ class Edit extends Widget
     form method: "POST", action: @url_for("edit2", token: @token), ->
       element "table", ->
         tr ->
-          td -> input name: "password", size: 20
+          td -> input name: "password", type: "password", size: 20
           td -> p "Password (required)"
         tr ->
           td -> input name: "filename", size: 20, value: @p_filename

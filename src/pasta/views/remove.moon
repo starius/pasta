@@ -5,6 +5,6 @@ class Remove extends Widget
     form method: "POST", action: @url_for("remove2", token: @token), ->
       element "table", ->
         tr ->
-          td -> input name: "password", size: 20
+          td -> input name: "password", type: "password", size: 20
           td -> p "Password (required)"
       input type: "submit", value: "Remove pasta"

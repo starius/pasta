@@ -3,6 +3,7 @@ local arc4random = require("arc4random")
 local crypto = require("crypto")
 local lru = require("lru")
 local yaml = require("yaml")
+local ngx = require("ngx")
 local urldecode = require("lapis.util").unescape
 local encode_with_secret = require("lapis.util.encoding").encode_with_secret
 local decode_with_secret = require("lapis.util.encoding").decode_with_secret
@@ -199,7 +200,7 @@ function view.createPasta(request)
         request.params.pasta_type
     )
     if not pasta then
-        return err
+        return {status=ngx.HTTP_BAD_REQUEST}, err
     end
     local url = request:url_for("view_pasta", {token=pasta.token})
     request.no_new_pasta = true
@@ -235,7 +236,7 @@ end
 function view.viewPasta(request)
     loadPasta(request)
     if not request.p then
-        return "No such pasta"
+        return {status=ngx.HTTP_NOT_FOUND}, "No such pasta"
     end
     request.no_new_pasta = true
     request.ext = getExt(request.p_filename)
@@ -248,7 +249,7 @@ end
 function view.rawPasta(request)
     loadPasta(request)
     if not request.p then
-        return "No such pasta"
+        return {status=ngx.HTTP_NOT_FOUND}, "No such pasta"
     end
     if request.p_filename ~= urldecode(request.params.filename or '') then
         return {
@@ -265,7 +266,7 @@ end
 function view.downloadPasta(request)
     loadPasta(request)
     if not request.p then
-        return "No such pasta"
+        return {status=ngx.HTTP_NOT_FOUND}, "No such pasta"
     end
     if request.p_filename ~= urldecode(request.params.filename or '') then
         return {
@@ -282,10 +283,10 @@ end
 function view.editPasta(request)
     loadPasta(request)
     if not request.p then
-        return "No such pasta"
+        return {status=ngx.HTTP_NOT_FOUND}, "No such pasta"
     end
     if not isEditable(request.p) then
-        return "The pasta is not editable"
+        return {status=ngx.HTTP_FORBIDDEN}, "The pasta is not editable"
     end
     request.no_new_pasta = true
     return {render = true}
@@ -294,16 +295,17 @@ end
 function view.editPasta2(request)
     loadPasta(request)
     if not request.p then
-        return "No such pasta"
+        return {status=ngx.HTTP_NOT_FOUND}, "No such pasta"
     end
     if not isEditable(request.p) then
-        return "The pasta is not editable"
+        return {status=ngx.HTTP_FORBIDDEN}, "The pasta is not editable"
     end
     if makePasswordHash(request.params.password) ~= request.p.password then
-        return "Wrong password"
+        return {status=ngx.HTTP_FORBIDDEN}, "Wrong password"
     end
     if #request.params.filename > config.max_filename then
-        return "Filename is too long. Max " .. config.max_filename
+        return {status=ngx.HTTP_BAD_REQUEST},
+            "Filename is too long. Max " .. config.max_filename
     end
     request.p:update {
         filename = request.params.filename,
@@ -319,10 +321,10 @@ end
 function view.removePasta(request)
     loadPasta(request)
     if not request.p then
-        return "No such pasta"
+        return {status=ngx.HTTP_NOT_FOUND}, "No such pasta"
     end
     if not isEditable(request.p) then
-        return "The pasta is not removable"
+        return {status=ngx.HTTP_FORBIDDEN}, "The pasta is not removable"
     end
     request.no_new_pasta = true
     return {render = true}
@@ -331,13 +333,13 @@ end
 function view.removePasta2(request)
     loadPasta(request)
     if not request.p then
-        return "No such pasta"
+        return {status=ngx.HTTP_NOT_FOUND}, "No such pasta"
     end
     if not isEditable(request.p) then
-        return "The pasta is not removable"
+        return {status=ngx.HTTP_FORBIDDEN}, "The pasta is not removable"
     end
     if makePasswordHash(request.params.password) ~= request.p.password then
-        return "Wrong password"
+        return {status=ngx.HTTP_FORBIDDEN}, "Wrong password"
     end
     deletePasta(request.p, request.token)
     return {redirect_to = request:url_for("index")}

@@ -69,7 +69,7 @@ local function deletePasta(p, token)
     end
 end
 
-local function loadPaste(request)
+local function loadPasta(request)
     request.token = request.params.token
     request.p = cache and cache:get(request.token)
     if not request.p then
@@ -233,7 +233,7 @@ function view.apiCreatePasta(request)
 end
 
 function view.viewPasta(request)
-    loadPaste(request)
+    loadPasta(request)
     if not request.p then
         return "No such pasta"
     end
@@ -246,7 +246,7 @@ function view.viewPasta(request)
 end
 
 function view.rawPasta(request)
-    loadPaste(request)
+    loadPasta(request)
     if not request.p then
         return "No such pasta"
     end
@@ -263,7 +263,7 @@ function view.rawPasta(request)
 end
 
 function view.downloadPasta(request)
-    loadPaste(request)
+    loadPasta(request)
     if not request.p then
         return "No such pasta"
     end
@@ -280,7 +280,7 @@ function view.downloadPasta(request)
 end
 
 function view.editPasta(request)
-    loadPaste(request)
+    loadPasta(request)
     if not request.p then
         return "No such pasta"
     end
@@ -292,7 +292,7 @@ function view.editPasta(request)
 end
 
 function view.editPasta2(request)
-    loadPaste(request)
+    loadPasta(request)
     if not request.p then
         return "No such pasta"
     end
@@ -317,7 +317,7 @@ function view.editPasta2(request)
 end
 
 function view.removePasta(request)
-    loadPaste(request)
+    loadPasta(request)
     if not request.p then
         return "No such pasta"
     end
@@ -329,7 +329,7 @@ function view.removePasta(request)
 end
 
 function view.removePasta2(request)
-    loadPaste(request)
+    loadPasta(request)
     if not request.p then
         return "No such pasta"
     end

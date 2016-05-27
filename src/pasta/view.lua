@@ -100,21 +100,29 @@ local function isEditable(p)
     return p.password ~= '' and not p.self_burning
 end
 
-local function makePasta(filename, content, pasta_type)
+local function checkFilename(filename)
     if type(filename) ~= 'string' then
         return nil, "Filename must be a string"
-    end
-    if type(content) ~= 'string' then
-        return nil, "Content must be a string"
-    end
-    if type(pasta_type) ~= 'string' then
-        return nil, "pasta_type must be a string"
     end
     if #filename > config.max_filename then
         return nil, "Filename is too long. Max " .. config.max_filename
     end
     if filename:match('/') then
         return nil, "Filename must not contain /"
+    end
+    return true
+end
+
+local function makePasta(filename, content, pasta_type)
+    local filename_ok, message = checkFilename(filename)
+    if type(content) ~= 'string' then
+        return nil, "Content must be a string"
+    end
+    if type(pasta_type) ~= 'string' then
+        return nil, "pasta_type must be a string"
+    end
+    if not filename_ok then
+        return filename_ok, message
     end
     local password_hash
     local self_burning = false
@@ -303,9 +311,9 @@ function view.editPasta2(request)
     if makePasswordHash(request.params.password) ~= request.p.password then
         return {status=ngx.HTTP_FORBIDDEN}, "Wrong password"
     end
-    if #request.params.filename > config.max_filename then
-        return {status=ngx.HTTP_BAD_REQUEST},
-            "Filename is too long. Max " .. config.max_filename
+    local filename_ok, message = checkFilename(request.params.filename)
+    if not filename_ok then
+        return {status=ngx.HTTP_BAD_REQUEST}, message
     end
     request.p:update {
         filename = request.params.filename,

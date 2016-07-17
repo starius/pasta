@@ -124,19 +124,21 @@ local function makePasta(filename, content, pasta_type)
     if not filename_ok then
         return filename_ok, message
     end
-    local password_hash
+    local password_hash = ''
     local self_burning = false
+    local redirect_to = false
     local nwords = config.nwords.short
     local password_plain
     if pasta_type == 'standard' then
-        password_hash = ''
     elseif pasta_type == 'editable' then
         password_plain = makePassword()
         password_hash = makePasswordHash(password_plain)
     elseif pasta_type == 'self_burning' then
-        password_hash = ''
         self_burning = true
         nwords = config.nwords.long
+    elseif pasta_type == 'url_shortener' then
+        filename = ''
+        redirect_to = true
     else
         return nil, "Unknown pasta type"
     end
@@ -159,6 +161,7 @@ local function makePasta(filename, content, pasta_type)
             p = model.Pasta:create {
                 hash = makeHash(token),
                 self_burning = self_burning,
+                redirect_to = redirect_to,
                 filename = filename,
                 salt = salt,
                 content = content,
@@ -222,6 +225,8 @@ function view.createPasta(request)
         return {render = "show_password"}
     elseif request.params.pasta_type == 'self_burning' then
         return {render = "show_self_burning"}
+    elseif request.params.pasta_type == 'url_shortener' then
+        return {render = "show_url_shortener"}
     end
 end
 
@@ -245,6 +250,9 @@ function view.viewPasta(request)
     loadPasta(request)
     if not request.p then
         return {status=ngx.HTTP_NOT_FOUND}, "No such pasta"
+    end
+    if request.p.redirect_to then
+        return {redirect_to = request.p.content}
     end
     request.no_new_pasta = true
     request.ext = getExt(request.p_filename)

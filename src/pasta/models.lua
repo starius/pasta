@@ -13,6 +13,7 @@ Fields of model Pasta:
   * string content
   * varchar password (used to delete or update; empty if not used or
     sha256(config.password_secret1 .. token .. config.password_secret2))
+  * boolean redirect_to (if true, it is url_shortener mode)
 
 Filename and content of self-burning pastas are encrypted with
 lapis.util.encode_with_secret({content=content, filename=filename}, key),

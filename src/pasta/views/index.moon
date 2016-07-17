@@ -22,6 +22,7 @@ class Index extends Widget
 
       br!
       br!
+
       input {
         type: "radio"
         name: "pasta_type"
@@ -30,7 +31,9 @@ class Index extends Widget
         checked: true
       }
       label for: 'pasta_type_standard', 'Standard pasta'
+
       raw '&nbsp;'\rep 10
+
       input {
         type: "radio"
         name: "pasta_type"
@@ -38,10 +41,12 @@ class Index extends Widget
         value: "editable"
       }
       label for: 'pasta_type_editable', 'Editable pasta'
+
       if ngx.var.agent_type == 'mobile'
         br!
       else
         raw '&nbsp;'\rep 10
+
       input {
         type: "radio"
         name: "pasta_type"
@@ -49,6 +54,16 @@ class Index extends Widget
         value: "self_burning"
       }
       label for: 'pasta_type_self_burning', 'Self-burning'
+
+      raw '&nbsp;'\rep 10
+
+      input {
+        type: "radio"
+        name: "pasta_type"
+        id: "pasta_type_url_shortener"
+        value: "url_shortener"
+      }
+      label for: 'pasta_type_url_shortener', 'URL shortener'
 
       br!
       br!

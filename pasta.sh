@@ -9,12 +9,14 @@ set -ue
 # cat file | pasta.sh
 # cat file | pasta.sh --password
 # cat file | pasta.sh --self-burning
+# pasta.sh http://example.com --url-shortener
 
 filename=""
 content="-"
 pasta_type="standard"
 mask='^view:'
 server="https://pasta.cf"
+url_shortener="no"
 
 for o in "$@"; do
     case "$o" in
@@ -29,13 +31,23 @@ for o in "$@"; do
             mask="^(raw|view):"
         ;;
 
+        --url-shortener)
+            pasta_type="url_shortener"
+            mask="^view:"
+            url_shortener="yes"
+        ;;
+
         --local)
             server="http://127.0.0.1:25516"
         ;;
 
         *)
-            filename=$(basename "$o")
-            content="$o"
+            if [ $url_shortener = "yes" ]; then
+                content="$o"
+            else
+                filename=$(basename "$o")
+                content="<$o"
+            fi
         ;;
     esac
 done
@@ -45,7 +57,7 @@ mask="($mask)|(There was an error|Failed to create paste)"
 response=$(curl \
     --silent --show-error \
     $server/api/create \
-    -F "content=<$content" \
+    -F "content=$content" \
     -F "filename=$filename" \
     -F "pasta_type=$pasta_type")
 echo "$response" \

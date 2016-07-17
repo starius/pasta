@@ -76,6 +76,16 @@ do
         label({
           ["for"] = 'pasta_type_self_burning'
         }, 'Self-burning')
+        raw(('&nbsp;'):rep(10))
+        input({
+          type = "radio",
+          name = "pasta_type",
+          id = "pasta_type_url_shortener",
+          value = "url_shortener"
+        })
+        label({
+          ["for"] = 'pasta_type_url_shortener'
+        }, 'URL shortener')
         br()
         br()
         return input({

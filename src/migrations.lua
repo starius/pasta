@@ -19,4 +19,8 @@ function migrations.rev_2016_02_19_init()
     db.query("ALTER TABLE pasta ADD PRIMARY KEY (hash);")
 end
 
+function migrations.rev_2016_07_17_redirect_to()
+    schema.add_column("pasta", "redirect_to", schema.types.boolean)
+end
+
 return migrations

@@ -34,7 +34,8 @@ build = {
             'src/pasta/views/show_self_burning.lua',
         ['pasta.views.edit'] = 'src/pasta/views/edit.lua',
         ['pasta.views.raw_pasta'] = 'src/pasta/views/raw_pasta.lua',
-        ['pasta.views.show_password'] = 'src/pasta/views/show_password.lua',
+        ['pasta.views.show_url_shortener'] =
+            'src/pasta/views/show_url_shortener.lua',
     },
     copy_directories = {
         'src/static',

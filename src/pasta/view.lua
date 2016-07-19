@@ -214,7 +214,6 @@ function view.createPasta(request)
         return {status=ngx.HTTP_BAD_REQUEST}, err
     end
     local url = request:url_for("view_pasta", {token=pasta.token})
-    request.no_new_pasta = true
     request.token = pasta.token
     request.filename = request.params.filename
     request.pasta_url = request:build_url(url)

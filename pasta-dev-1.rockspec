@@ -30,6 +30,8 @@ build = {
         ['pasta.views.view_pasta'] = 'src/pasta/views/view_pasta.lua',
         ['pasta.views.remove'] = 'src/pasta/views/remove.lua',
         ['pasta.views.index'] = 'src/pasta/views/index.lua',
+        ['pasta.views.show_password'] =
+            'src/pasta/views/show_password.lua',
         ['pasta.views.show_self_burning'] =
             'src/pasta/views/show_self_burning.lua',
         ['pasta.views.edit'] = 'src/pasta/views/edit.lua',

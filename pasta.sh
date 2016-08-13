@@ -12,7 +12,7 @@ set -ue
 # pasta.sh http://example.com --url-shortener
 
 filename=""
-content="-"
+content="<-"
 pasta_type="standard"
 mask='^view:'
 server="https://pasta.cf"

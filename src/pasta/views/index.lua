@@ -27,8 +27,8 @@ do
         end)
         local cols, rows
         if ngx.var.agent_type == 'mobile' then
-          cols = 45
-          rows = 20
+          cols = 35
+          rows = 14
         else
           cols = 80
           rows = 24

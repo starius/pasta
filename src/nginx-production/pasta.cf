@@ -3,7 +3,7 @@
 map $http_user_agent $agent_type_phase1 {
     default 'mobile';
     '' 'unknown';
-    ~*iphone|ipod|blackberry|palm|windows\s+ce 'mobile';
+    ~*iphone|ipod|android|mobile|blackberry|palm|windows\s+ce 'mobile';
     ~*windows|linux|os\s+[x9]|solaris|bsd 'desktop';
     ~*spider|crawl|slurp|bot|feedburner 'bot';
 }

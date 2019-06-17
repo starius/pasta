@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package database;
+
+message Record {
+  bytes content = 1;
+  string filename = 2;
+  bool self_burning = 3;
+  bool redirect = 4;
+  bool long_id = 5;
+  bool binary = 6;
+}

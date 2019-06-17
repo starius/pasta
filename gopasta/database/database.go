@@ -144,3 +144,10 @@ func (d *Database) Add(record *Record) (uint64, error) {
 	}
 	return key, nil
 }
+
+func (d *Database) RecordsCount() int64 {
+	d.mu.Lock()
+	indexLen := d.indexLen
+	d.mu.Unlock()
+	return int64(indexLen) / 8
+}

@@ -1,6 +1,8 @@
 package server
 
-const mainTemplate = `<!DOCTYPE HTML><html lang="en">
+import "html/template"
+
+var mainTemplate = template.Must(template.New("main").Parse(`<!DOCTYPE HTML><html lang="en">
 <head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Pasta</title>
 <style>
@@ -59,4 +61,4 @@ or select a file: <input type="file" name="file" id="file">
 </form>
 <br/><br/>
 Number of uploads: {{.Uploads}}.
-</body></html>`
+</body></html>`))

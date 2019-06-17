@@ -2,12 +2,12 @@ package server
 
 import (
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
 
+	"github.com/robfig/humanize"
 	"github.com/starius/pasta/gopasta/database"
 )
 
@@ -142,5 +142,12 @@ func (h *Handler) handleGet(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) handleMain(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, mainTemplate)
+	vars := struct {
+		MaxSize string
+		Uploads string
+	}{
+		MaxSize: humanize.IBytes(uint64(h.maxSize)),
+		Uploads: humanize.Comma(h.db.RecordsCount()),
+	}
+	mainTemplate.Execute(w, vars)
 }

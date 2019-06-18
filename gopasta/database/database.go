@@ -14,6 +14,9 @@ import (
 
 //go:generate protoc --proto_path=. --go_out=. record.proto
 
+//go:generate go get gitlab.com/starius/lru-gen
+//go:generate lru-gen -package database -key "uint64" -value "*Record" -output lru.go
+
 type File interface {
 	io.ReaderAt
 	io.WriterAt

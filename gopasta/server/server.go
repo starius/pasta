@@ -1,15 +1,21 @@
 package server
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/robfig/humanize"
 	"github.com/starius/pasta/gopasta/database"
 )
+
+//go:generate go get github.com/jteeuwen/go-bindata/go-bindata
+//go:generate go-bindata -pkg server -nometadata -nomemcopy -nocompress -prefix $GOPATH/src/github.com/starius/pasta/gopasta/server -o $GOPATH/src/github.com/starius/pasta/gopasta/server/favicon.go $GOPATH/src/github.com/starius/pasta/gopasta/server/favicon.ico
+//go:generate go fmt $GOPATH/src/github.com/starius/pasta/gopasta/server/favicon.go
 
 type IDEncoder interface {
 	Encode(id uint64, longID bool) (phrase string, err error)
@@ -26,7 +32,13 @@ type Handler struct {
 }
 
 func NewHandler(db *database.Database, idEncoder IDEncoder, maxSize int) *Handler {
+	faviconReader := bytes.NewReader(MustAsset("favicon.ico"))
+	faviconHandler := func(w http.ResponseWriter, r *http.Request) {
+		http.ServeContent(w, r, "favicon.ico", time.Unix(0, 0), faviconReader)
+	}
+
 	h := &Handler{db, idEncoder, http.NewServeMux(), int64(maxSize)}
+	h.mux.HandleFunc("/favicon.ico", faviconHandler)
 	h.mux.HandleFunc("/api/create", h.handleUpload)
 	h.mux.HandleFunc("/", h.handleGet)
 	return h

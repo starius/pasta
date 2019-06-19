@@ -147,7 +147,11 @@ func (h *Handler) handleGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if record.Redirect {
-		http.Redirect(w, r, string(record.Content), http.StatusMovedPermanently)
+		status := http.StatusMovedPermanently
+		if record.SelfBurning {
+			status = http.StatusFound
+		}
+		http.Redirect(w, r, string(record.Content), status)
 	} else {
 		w.Write(record.Content)
 	}

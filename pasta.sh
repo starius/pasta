@@ -2,43 +2,49 @@
 
 set -ue
 
+server="https://pasta.cf"
+
 # Usage:
-# pasta.sh file
-# pasta.sh file --password
-# pasta.sh file --self-burning
-# cat file | pasta.sh
-# cat file | pasta.sh --password
-# cat file | pasta.sh --self-burning
-# pasta.sh http://example.com --url-shortener
+# $ pasta.sh file [options]
+# or
+# $ cat file | pasta.sh [options]
+#
+# Options:
+#
+# --self-burning
+#    Generate one-time link, which is destroyed when accessed.
+#
+# --long-id
+#    Generate long ID instead of short human-readable ID
+#
+# --url-shortener
+#    The content is used as URL for redirect.
 
 filename=""
 content="<-"
-pasta_type="standard"
-mask='^view:'
-server="https://pasta.cf"
+
+query="/api/create?"
+
 url_shortener="no"
 
 for o in "$@"; do
     case "$o" in
 
-        --password)
-            pasta_type="editable"
-            mask="^(password|view):"
+        --self-burning)
+            query="${query}self_burning=yes&"
         ;;
 
-        --self-burning)
-            pasta_type="self_burning"
-            mask="^(raw|view):"
+        --long-id)
+            query="${query}long_id=yes&"
         ;;
 
         --url-shortener)
-            pasta_type="url_shortener"
-            mask="^view:"
             url_shortener="yes"
+            query="${query}redirect=yes&"
         ;;
 
         --local)
-            server="http://127.0.0.1:25516"
+            server="http://127.0.0.1:8042"
         ;;
 
         *)
@@ -52,14 +58,8 @@ for o in "$@"; do
     esac
 done
 
-mask="($mask)|(There was an error|Failed to create paste)"
-
-response=$(curl \
+curl \
     --silent --show-error \
-    $server/api/create \
+    "${server}${query}" \
     -F "content=$content" \
-    -F "filename=$filename" \
-    -F "pasta_type=$pasta_type")
-echo "$response" \
-| egrep "$mask" \
-| sort --reverse
+    -F "filename=$filename"

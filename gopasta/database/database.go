@@ -60,11 +60,11 @@ func recordSize(record *Record) uint64 {
 
 func (d *Database) Lookup(key uint64) (*Record, error) {
 	d.mu.Lock()
-	r := d.lru.Get(key)
+	r, has := d.lru.Get(key)
 	indexLen := d.indexLen
 	dataLen := d.dataLen
 	d.mu.Unlock()
-	if r != nil {
+	if has {
 		return r, nil
 	}
 	if key >= indexLen/8 {

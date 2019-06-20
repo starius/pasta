@@ -81,17 +81,18 @@ func (l *LRU) makeFreeSpace(bytes uint64) {
 	}
 }
 
-func (l *LRU) Get(key uint64) *Record {
-	e, has := l.m[key]
+func (l *LRU) Get(key uint64) (value *Record, has bool) {
+	var e *element
+	e, has = l.m[key]
 	if !has {
-		return nil
+		return
 	}
 	l.cut(e)
 	l.setNewest(e)
-	return e.value
+	return e.value, true
 }
 
-func (l *LRU) Set(key uint64, value *Record, bytes uint64) {
+func (l *LRU) Set(key uint64, value *Record, bytes uint64) (existed bool) {
 	e, has := l.m[key]
 	if has {
 		l.del(e)
@@ -109,4 +110,13 @@ func (l *LRU) Set(key uint64, value *Record, bytes uint64) {
 	l.bytesUsed += bytes
 	l.setNewest(e)
 	l.removed = nil
+	return has
+}
+
+func (l *LRU) DeleteIfExists(key uint64) (existed bool) {
+	e, has := l.m[key]
+	if has {
+		l.del(e)
+	}
+	return has
 }

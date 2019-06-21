@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"crypto/subtle"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -29,18 +30,20 @@ type Handler struct {
 	mux *http.ServeMux
 
 	maxSize int64
+
+	adminAuth string
 }
 
-func NewHandler(db *database.Database, idEncoder IDEncoder, maxSize int) *Handler {
+func NewHandler(db *database.Database, idEncoder IDEncoder, maxSize int, adminAuth string) *Handler {
 	faviconReader := bytes.NewReader(MustAsset("favicon.ico"))
 	faviconHandler := func(w http.ResponseWriter, r *http.Request) {
 		http.ServeContent(w, r, "favicon.ico", time.Unix(0, 0), faviconReader)
 	}
 
-	h := &Handler{db, idEncoder, http.NewServeMux(), int64(maxSize)}
+	h := &Handler{db, idEncoder, http.NewServeMux(), int64(maxSize), adminAuth}
 	h.mux.HandleFunc("/favicon.ico", faviconHandler)
 	h.mux.HandleFunc("/api/create", h.handleUpload)
-	h.mux.HandleFunc("/", h.handleGet)
+	h.mux.HandleFunc("/", h.handleRecord)
 	return h
 }
 
@@ -49,7 +52,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
+	if r.Method != http.MethodPost {
 		log.Printf("handleUpload was called with method %q.", r.Method)
 		http.Error(w, "bad method", http.StatusMethodNotAllowed)
 		return
@@ -109,15 +112,22 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Your link: %s\n", targetURL)
 }
 
-func (h *Handler) handleGet(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		log.Printf("handleGet was called with method %q.", r.Method)
+func (h *Handler) handleRecord(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet && r.Method != http.MethodDelete {
+		log.Printf("handleRecord was called with method %q.", r.Method)
 		http.Error(w, "bad method", http.StatusMethodNotAllowed)
 		return
 	}
-	if r.URL.Path == "" || r.URL.Path == "/" {
+	if r.Method == http.MethodGet && (r.URL.Path == "" || r.URL.Path == "/") {
 		h.handleMain(w, r)
 		return
+	}
+	if r.Method == http.MethodDelete {
+		auth := r.Header.Get("Authorization")
+		if subtle.ConstantTimeCompare([]byte(auth), []byte(h.adminAuth)) != 1 {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
 	}
 	pathParts := strings.Split(r.URL.Path, "/")
 	phrase := pathParts[len(pathParts)-1]
@@ -133,6 +143,13 @@ func (h *Handler) handleGet(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("idEncoder.Decode(%q): %v.", phrase, err)
 		http.Error(w, "bad link", http.StatusBadRequest)
+		return
+	}
+	if r.Method == http.MethodDelete {
+		if err := h.db.Delete(id); err != nil {
+			log.Printf("db.Delete(%d): %v.", id, err)
+			http.Error(w, "failed to delete the link", http.StatusInternalServerError)
+		}
 		return
 	}
 	record, err := h.db.Lookup(id)

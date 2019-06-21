@@ -58,6 +58,41 @@ func recordSize(record *Record) uint64 {
 	return uint64(len(record.Filename) + len(record.Content))
 }
 
+func (d *Database) getOffsets(key, indexLen, dataLen uint64) (dataBegin, dataEnd uint64, err error) {
+	if key >= indexLen/8 {
+		return 0, 0, fmt.Errorf("the record does not exist")
+	}
+	indexBuffer := make([]byte, 8+8)
+	indexBuffer2 := indexBuffer
+	if key*8 == indexLen-8 {
+		// Last element.
+		indexBuffer2 = indexBuffer2[0:8]
+	}
+	if _, err := d.index.ReadAt(indexBuffer2, int64(key*8)); err != nil {
+		return 0, 0, err
+	}
+	dataBegin = binary.LittleEndian.Uint64(indexBuffer[0:8])
+	dataEnd = binary.LittleEndian.Uint64(indexBuffer[8:16])
+	if key*8 == indexLen-8 {
+		// Last element.
+		dataEnd = dataLen
+	}
+	if dataBegin == 0 && key != 0 {
+		return 0, 0, fmt.Errorf("the record does not exist in the middle")
+	}
+	size := dataEnd - dataBegin
+	if size > d.maxSize {
+		return 0, 0, fmt.Errorf("the record seems to be too long")
+	}
+	return dataBegin, dataEnd, nil
+}
+
+func (d *Database) wipeData(dataBegin, dataEnd uint64) error {
+	dummy := make([]byte, dataEnd-dataBegin)
+	_, err := d.rawData.WriteAt(dummy, int64(dataBegin))
+	return err
+}
+
 func (d *Database) Lookup(key uint64) (*Record, error) {
 	d.mu.Lock()
 	r, has := d.lru.Get(key)
@@ -67,36 +102,15 @@ func (d *Database) Lookup(key uint64) (*Record, error) {
 	if has {
 		return r, nil
 	}
-	if key >= indexLen/8 {
-		return nil, fmt.Errorf("the record does not exist")
-	}
-	indexBuffer := make([]byte, 8+8)
-	indexBuffer2 := indexBuffer
-	if key*8 == indexLen-8 {
-		// Last element.
-		indexBuffer2 = indexBuffer2[0:8]
-	}
-	if _, err := d.index.ReadAt(indexBuffer2, int64(key*8)); err != nil {
+	dataBegin, dataEnd, err := d.getOffsets(key, indexLen, dataLen)
+	if err != nil {
 		return nil, err
-	}
-	dataBegin := binary.LittleEndian.Uint64(indexBuffer[0:8])
-	dataEnd := binary.LittleEndian.Uint64(indexBuffer[8:16])
-	if key*8 == indexLen-8 {
-		// Last element.
-		dataEnd = dataLen
-	}
-	if dataBegin == 0 && key != 0 {
-		return nil, fmt.Errorf("the record does not exist in the middle")
-	}
-	size := dataEnd - dataBegin
-	if size > d.maxSize {
-		return nil, fmt.Errorf("the record seems to be too long")
 	}
 	dataBuffer := make([]byte, dataEnd-dataBegin)
 	if _, err := d.data.ReadAt(dataBuffer, int64(dataBegin)); err != nil {
 		return nil, err
 	}
-	dataBuffer, err := snappy.Decode(nil, dataBuffer)
+	dataBuffer, err = snappy.Decode(nil, dataBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -105,9 +119,7 @@ func (d *Database) Lookup(key uint64) (*Record, error) {
 		return nil, err
 	}
 	if record.SelfBurning {
-		// Wipe the record.
-		dummy := make([]byte, dataEnd-dataBegin)
-		if _, err := d.rawData.WriteAt(dummy, int64(dataBegin)); err != nil {
+		if err := d.wipeData(dataBegin, dataEnd); err != nil {
 			return nil, err
 		}
 	} else {
@@ -116,6 +128,22 @@ func (d *Database) Lookup(key uint64) (*Record, error) {
 		d.mu.Unlock()
 	}
 	return &record, nil
+}
+
+func (d *Database) Delete(key uint64) error {
+	d.mu.Lock()
+	d.lru.DeleteIfExists(key)
+	indexLen := d.indexLen
+	dataLen := d.dataLen
+	d.mu.Unlock()
+	dataBegin, dataEnd, err := d.getOffsets(key, indexLen, dataLen)
+	if err != nil {
+		return err
+	}
+	if err := d.wipeData(dataBegin, dataEnd); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (d *Database) Add(record *Record) (uint64, error) {

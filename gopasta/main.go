@@ -29,6 +29,7 @@ var (
 	listen       = flag.String("listen", ":8042", "Address to listen on")
 	secretFile   = flag.String("secret-file", "", "Secret file")
 	genSecret    = flag.Bool("gen-secret", false, "Generate random and exit")
+	printAdmin   = flag.Bool("print-admin-auth", false, "Print admin Authorization header and exit")
 	maxSize      = flag.Int("max-size", 10*1024*1024, "Max record size, bytes")
 	cacheRecords = flag.Int("cache-records", 10000, "Cache size, records")
 	cacheBytes   = flag.Int("cache-bytes", 100*1024*1024, "Cache size, bytes")
@@ -37,6 +38,7 @@ var (
 const saltHex = "b59e698ae2b5893a2a45edf3f809ef5977aa9b3526fbb76cf188817d6bbf19e3"
 const databaseInfo = "database"
 const idInfo = "id"
+const adminAuthInfo = "adminAuth"
 
 func main() {
 	flag.Parse()
@@ -75,6 +77,17 @@ func main() {
 	salt, err := hex.DecodeString(saltHex)
 	if err != nil {
 		panic(err)
+	}
+
+	adminAuthHKDF := hkdf.New(sha256.New, mainKey, salt, []byte(adminAuthInfo))
+	adminAuthBytes := make([]byte, 16)
+	if _, err := io.ReadFull(adminAuthHKDF, adminAuthBytes); err != nil {
+		panic(err)
+	}
+	adminAuth := hex.EncodeToString(adminAuthBytes)
+	if *printAdmin {
+		fmt.Println(adminAuth)
+		os.Exit(0)
 	}
 
 	dbHKDF := hkdf.New(sha256.New, mainKey, salt, []byte(databaseInfo))
@@ -129,6 +142,6 @@ func main() {
 		panic(err)
 	}
 
-	handler := server.NewHandler(db, idEncoder, *maxSize)
+	handler := server.NewHandler(db, idEncoder, *maxSize, adminAuth)
 	log.Fatal(http.ListenAndServe(*listen, handler))
 }

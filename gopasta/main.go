@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"crypto/aes"
 	"crypto/sha256"
 	"encoding/hex"
@@ -12,6 +13,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"syscall"
 
 	"github.com/starius/pasta/gopasta/database"
@@ -20,6 +22,7 @@ import (
 	"gitlab.com/NebulousLabs/entropy-mnemonics"
 	"gitlab.com/NebulousLabs/fastrand"
 	"gitlab.com/starius/fpe/phrase"
+	"golang.org/x/crypto/acme/autocert"
 	"golang.org/x/crypto/hkdf"
 	"golang.org/x/crypto/ssh/terminal"
 )
@@ -27,6 +30,7 @@ import (
 var (
 	dir          = flag.String("dir", ".", "Directory to store data in")
 	listen       = flag.String("listen", ":8042", "Address to listen on")
+	letsDomains  = flag.String("letsencrypt-domains", "", "Run Let's Encrypt on these domains")
 	secretFile   = flag.String("secret-file", "", "Secret file")
 	genSecret    = flag.Bool("gen-secret", false, "Generate random and exit")
 	printAdmin   = flag.Bool("print-admin-auth", false, "Print admin Authorization header and exit")
@@ -39,6 +43,14 @@ const saltHex = "b59e698ae2b5893a2a45edf3f809ef5977aa9b3526fbb76cf188817d6bbf19e
 const databaseInfo = "database"
 const idInfo = "id"
 const adminAuthInfo = "adminAuth"
+
+func redirectToHTTPS(w http.ResponseWriter, r *http.Request) {
+	url := "https://" + r.Host + r.URL.Path
+	if len(r.URL.RawQuery) > 0 {
+		url += "?" + r.URL.RawQuery
+	}
+	http.Redirect(w, r, url, http.StatusPermanentRedirect)
+}
 
 func main() {
 	flag.Parse()
@@ -143,5 +155,36 @@ func main() {
 	}
 
 	handler := server.NewHandler(db, idEncoder, *maxSize, adminAuth)
+
+	if *letsDomains != "" {
+		// Use Let's Encrypt.
+		set := make(map[string]struct{})
+		for _, host := range strings.Split(*letsDomains, ",") {
+			host = strings.TrimSpace(host)
+			set[host] = struct{}{}
+		}
+		errHost := fmt.Errorf("bad host")
+		hostPolicy := func(ctx context.Context, host string) error {
+			if _, has := set[host]; has {
+				return nil
+			} else {
+				return errHost
+			}
+		}
+		m := &autocert.Manager{
+			Cache:      autocert.DirCache(*dir),
+			Prompt:     autocert.AcceptTOS,
+			HostPolicy: hostPolicy,
+		}
+		certHandler := m.HTTPHandler(http.HandlerFunc(redirectToHTTPS))
+		listener := m.Listener()
+		go func() {
+			log.Fatal(http.ListenAndServe(":80", certHandler))
+		}()
+		go func() {
+			log.Fatal(http.Serve(listener, handler))
+		}()
+	}
+
 	log.Fatal(http.ListenAndServe(*listen, handler))
 }

@@ -168,7 +168,7 @@ func (h *Handler) handleRecord(w http.ResponseWriter, r *http.Request) {
 		if record.SelfBurning {
 			status = http.StatusFound
 		}
-		http.Redirect(w, r, string(record.Content), status)
+		http.Redirect(w, r, string(bytes.TrimSpace(record.Content)), status)
 	} else {
 		w.Write(record.Content)
 	}

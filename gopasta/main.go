@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"crypto/aes"
 	"crypto/sha256"
 	"encoding/hex"
@@ -158,23 +157,11 @@ func main() {
 
 	if *letsDomains != "" {
 		// Use Let's Encrypt.
-		set := make(map[string]struct{})
-		for _, host := range strings.Split(*letsDomains, ",") {
-			host = strings.TrimSpace(host)
-			set[host] = struct{}{}
-		}
-		errHost := fmt.Errorf("bad host")
-		hostPolicy := func(ctx context.Context, host string) error {
-			if _, has := set[host]; has {
-				return nil
-			} else {
-				return errHost
-			}
-		}
+		domains := strings.Split(*letsDomains, ",")
 		m := &autocert.Manager{
 			Cache:      autocert.DirCache(*dir),
 			Prompt:     autocert.AcceptTOS,
-			HostPolicy: hostPolicy,
+			HostPolicy: autocert.HostWhitelist(domains...),
 		}
 		certHandler := m.HTTPHandler(http.HandlerFunc(redirectToHTTPS))
 		listener := m.Listener()

@@ -20,6 +20,7 @@ import (
 	"github.com/tyler-smith/go-bip39/wordlists"
 	"gitlab.com/NebulousLabs/entropy-mnemonics"
 	"gitlab.com/NebulousLabs/fastrand"
+	"gitlab.com/starius/encrypt-autocert-cache"
 	"gitlab.com/starius/fpe/phrase"
 	"golang.org/x/crypto/acme/autocert"
 	"golang.org/x/crypto/hkdf"
@@ -42,6 +43,7 @@ const saltHex = "b59e698ae2b5893a2a45edf3f809ef5977aa9b3526fbb76cf188817d6bbf19e
 const databaseInfo = "database"
 const idInfo = "id"
 const adminAuthInfo = "adminAuth"
+const certInfo = "cert"
 
 func redirectToHTTPS(w http.ResponseWriter, r *http.Request) {
 	url := "https://" + r.Host + r.URL.Path
@@ -158,8 +160,20 @@ func main() {
 	if *letsDomains != "" {
 		// Use Let's Encrypt.
 		domains := strings.Split(*letsDomains, ",")
+
+		// Encrypted cert cache.
+		certHKDF := hkdf.New(sha256.New, mainKey, salt, []byte(certInfo))
+		certKey := make([]byte, 32)
+		if _, err := io.ReadFull(certHKDF, certKey); err != nil {
+			panic(err)
+		}
+		cache, err := encrypt.NewEncryptedCache(autocert.DirCache(*dir), certKey)
+		if err != nil {
+			panic(err)
+		}
+
 		m := &autocert.Manager{
-			Cache:      autocert.DirCache(*dir),
+			Cache:      cache,
 			Prompt:     autocert.AcceptTOS,
 			HostPolicy: autocert.HostWhitelist(domains...),
 		}

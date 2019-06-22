@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -81,6 +82,21 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		filename = header.Filename
+	}
+	if redirect {
+		content = bytes.TrimSpace(content)
+		u, err := url.Parse(string(content))
+		if err != nil {
+			log.Printf("URL is invalid: %v.", err)
+			http.Error(w, "URL is invalid", http.StatusBadRequest)
+			return
+		}
+		if !u.IsAbs() {
+			log.Printf("URL is not absolute.")
+			http.Error(w, "URL is  not absolute", http.StatusBadRequest)
+			return
+		}
+		content = []byte(u.String())
 	}
 	record := &database.Record{
 		Content:     content,
@@ -168,7 +184,7 @@ func (h *Handler) handleRecord(w http.ResponseWriter, r *http.Request) {
 		if record.SelfBurning {
 			status = http.StatusFound
 		}
-		http.Redirect(w, r, string(bytes.TrimSpace(record.Content)), status)
+		http.Redirect(w, r, string(record.Content), status)
 	} else {
 		w.Write(record.Content)
 	}

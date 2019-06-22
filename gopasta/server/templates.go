@@ -40,11 +40,12 @@ h1, h2 {
     </tr>
 </table>
 <textarea cols="80" name="content" rows="24"></textarea>
-<br/>
-Max size: {{.MaxSize}}
 
 <br/><br/>
 or select a file: <input type="file" name="file" id="file">
+
+<br/>
+Max size: {{.MaxSize}}
 
 <br/><br/>
 <input type="checkbox" name="self_burning" id="self_burning"/>
@@ -59,8 +60,14 @@ or select a file: <input type="file" name="file" id="file">
 <br/><br/>
 <input type="submit" value="Upload"/>
 </form>
+
+<br/><br/>
+If you upload a file, its name is available from the link.
+
 <br/><br/>
 Number of uploads: {{.Uploads}}.
+
 <br/><br/>
 Get the <a href="https://github.com/starius/pasta/tree/master/gopasta">source</a> of the site and install on your own server in 3 seconds: <code>go get github.com/starius/pasta/gopasta</code> .
+
 </body></html>`))

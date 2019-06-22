@@ -186,6 +186,9 @@ func (h *Handler) handleRecord(w http.ResponseWriter, r *http.Request) {
 		}
 		http.Redirect(w, r, string(record.Content), status)
 	} else {
+		if record.Filename != "" {
+			w.Header().Add("Content-Disposition", fmt.Sprintf("inline; filename=%q", record.Filename))
+		}
 		w.Write(record.Content)
 	}
 }

@@ -204,5 +204,7 @@ func (h *Handler) handleMain(w http.ResponseWriter, r *http.Request) {
 		Uploads: humanize.Comma(h.db.RecordsCount()),
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	mainTemplate.Execute(w, vars)
+	if err := mainTemplate.Execute(w, vars); err != nil {
+		log.Printf("failed to execute template: %v", err)
+	}
 }

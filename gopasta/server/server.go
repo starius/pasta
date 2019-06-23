@@ -130,12 +130,12 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) handleRecord(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet && r.Method != http.MethodDelete {
+	if r.Method != http.MethodGet && r.Method != http.MethodHead && r.Method != http.MethodDelete {
 		log.Printf("handleRecord was called with method %q.", r.Method)
 		http.Error(w, "bad method", http.StatusMethodNotAllowed)
 		return
 	}
-	if r.Method == http.MethodGet && (r.URL.Path == "" || r.URL.Path == "/") {
+	if (r.Method == http.MethodGet || r.Method == http.MethodHead) && (r.URL.Path == "" || r.URL.Path == "/") {
 		h.handleMain(w, r)
 		return
 	}

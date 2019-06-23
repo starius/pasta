@@ -190,7 +190,8 @@ func (h *Handler) handleRecord(w http.ResponseWriter, r *http.Request) {
 		if record.Filename != "" {
 			w.Header().Add("Content-Disposition", fmt.Sprintf("inline; filename=%q", record.Filename))
 		}
-		w.Write(record.Content)
+		contentReader := bytes.NewReader(record.Content)
+		http.ServeContent(w, r, record.Filename, time.Unix(0, 0), contentReader)
 	}
 }
 

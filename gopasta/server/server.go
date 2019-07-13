@@ -13,6 +13,7 @@ import (
 
 	"github.com/robfig/humanize"
 	"github.com/starius/pasta/gopasta/database"
+	"golang.org/x/net/idna"
 )
 
 //go:generate go get github.com/jteeuwen/go-bindata/go-bindata
@@ -52,6 +53,8 @@ func NewHandler(db *database.Database, idEncoder IDEncoder, maxSize int, adminAu
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.mux.ServeHTTP(w, r)
 }
+
+var punycode = idna.New()
 
 func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -122,7 +125,12 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 	if r.TLS != nil {
 		scheme = "https"
 	}
-	targetURL := fmt.Sprintf("%s://%s/%s", scheme, r.Host, phrase)
+	host, err := punycode.ToUnicode(r.Host)
+	if err != nil {
+		log.Printf("punycode.ToUnicode(%q): %v.", r.Host, err)
+		host = r.Host
+	}
+	targetURL := fmt.Sprintf("%s://%s/%s", scheme, host, phrase)
 	if !selfBurning && !redirect {
 		http.Redirect(w, r, targetURL, http.StatusFound)
 	}

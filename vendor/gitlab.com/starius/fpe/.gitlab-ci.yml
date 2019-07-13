@@ -1,0 +1,24 @@
+image: golang:1.11.1
+
+stages:
+  - lint
+  - test
+
+before_script:
+  - mkdir -p $GOPATH/src/gitlab.com/starius
+  - cp -R $CI_PROJECT_DIR $GOPATH/src/gitlab.com/starius/fpe
+  - cd $GOPATH/src/gitlab.com/starius/fpe
+  - go get -t ./...
+
+lint:
+  stage: lint
+  script:
+    - go get -u github.com/alecthomas/gometalinter
+    - gometalinter --install
+    - gometalinter ./...
+
+unit-tests:
+  stage: test
+  script:
+    - go test -race ./...
+    - go test -bench . ./...

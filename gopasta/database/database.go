@@ -10,6 +10,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/snappy"
+	"gitlab.com/starius/deallocate"
 )
 
 //go:generate protoc --proto_path=. --go_out=. record.proto
@@ -23,11 +24,12 @@ type File interface {
 }
 
 type Database struct {
-	index, data, rawData File
-	indexLen, dataLen    uint64
-	mu                   sync.Mutex
-	maxSize              uint64
-	lru                  *LRU
+	index, data       File
+	rawData           *os.File
+	indexLen, dataLen uint64
+	mu                sync.Mutex
+	maxSize           uint64
+	lru               *LRU
 }
 
 func NewDatabase(index, data *os.File, indexBlock, dataBlock cipher.Block, maxSize, cacheRecords, cacheBytes int) (*Database, error) {
@@ -42,6 +44,9 @@ func NewDatabase(index, data *os.File, indexBlock, dataBlock cipher.Block, maxSi
 	lru, err := NewLRU(uint64(cacheRecords), uint64(cacheBytes))
 	if err != nil {
 		return nil, err
+	}
+	if err := deallocate.MakeSparse(data); err != nil {
+		return nil, fmt.Errorf("failed to mark file sparse: %v", err)
 	}
 	return &Database{
 		index:    WrapInCTR(indexBlock, index),
@@ -88,9 +93,7 @@ func (d *Database) getOffsets(key, indexLen, dataLen uint64) (dataBegin, dataEnd
 }
 
 func (d *Database) wipeData(dataBegin, dataEnd uint64) error {
-	dummy := make([]byte, dataEnd-dataBegin)
-	_, err := d.rawData.WriteAt(dummy, int64(dataBegin))
-	return err
+	return deallocate.PunchHoleWithFallback(d.rawData, int64(dataBegin), int64(dataEnd-dataBegin))
 }
 
 func (d *Database) Lookup(key uint64) (*Record, error) {

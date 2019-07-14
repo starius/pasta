@@ -95,6 +95,14 @@ var mainTemplate = template.Must(template.New("main").Parse(`<!DOCTYPE HTML><htm
 
 {{.Uploads}} {{ if eq .Uploads "1" }} upload has {{ else }} uploads have {{ end }} been made.
 
+{{ if .Domains }}
+  <br/><br/>
+  The site runs on the following domains:
+  {{ range .Domains }}
+    <a href="http://{{ print . }}">{{ print . }}</a>
+  {{ end }}
+{{ end }}
+
 <br/><br/>
 Get the <a href="https://github.com/starius/pasta/tree/master/gopasta">source</a> of the site and install on your own server in 3 seconds: <code>go get github.com/starius/pasta/gopasta</code> .
 

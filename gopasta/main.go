@@ -31,6 +31,7 @@ var (
 	dir          = flag.String("dir", ".", "Directory to store data in")
 	listen       = flag.String("listen", ":8042", "Address to listen on")
 	letsDomains  = flag.String("letsencrypt-domains", "", "Run Let's Encrypt on these domains")
+	domains      = flag.String("domains", "", "List of domains listed on the main page")
 	secretFile   = flag.String("secret-file", "", "Secret file")
 	genSecret    = flag.Bool("gen-secret", false, "Generate random and exit")
 	printAdmin   = flag.Bool("print-admin-auth", false, "Print admin Authorization header and exit")
@@ -155,11 +156,15 @@ func main() {
 		panic(err)
 	}
 
-	handler := server.NewHandler(db, idEncoder, *maxSize, adminAuth)
+	domainsList := strings.Split(*domains, ",")
+	if len(domainsList[0]) == 0 {
+		domainsList = nil
+	}
+	handler := server.NewHandler(db, idEncoder, *maxSize, adminAuth, domainsList)
 
 	if *letsDomains != "" {
 		// Use Let's Encrypt.
-		domains := strings.Split(*letsDomains, ",")
+		letsDomainsList := strings.Split(*letsDomains, ",")
 
 		// Encrypted cert cache.
 		certHKDF := hkdf.New(sha256.New, mainKey, salt, []byte(certInfo))
@@ -175,7 +180,7 @@ func main() {
 		m := &autocert.Manager{
 			Cache:      cache,
 			Prompt:     autocert.AcceptTOS,
-			HostPolicy: autocert.HostWhitelist(domains...),
+			HostPolicy: autocert.HostWhitelist(letsDomainsList...),
 		}
 		certHandler := m.HTTPHandler(http.HandlerFunc(redirectToHTTPS))
 		listener := m.Listener()

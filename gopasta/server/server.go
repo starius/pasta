@@ -36,16 +36,18 @@ type Handler struct {
 	maxSize int64
 
 	adminAuth string
+
+	domains []string
 }
 
-func NewHandler(db *database.Database, idEncoder IDEncoder, maxSize int, adminAuth string) *Handler {
+func NewHandler(db *database.Database, idEncoder IDEncoder, maxSize int, adminAuth string, domains []string) *Handler {
 	faviconReader := bytes.NewReader(MustAsset("favicon.ico"))
 	faviconHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "image/vnd.microsoft.icon")
 		http.ServeContent(w, r, "favicon.ico", time.Unix(0, 0), faviconReader)
 	}
 
-	h := &Handler{db, idEncoder, http.NewServeMux(), int64(maxSize), adminAuth}
+	h := &Handler{db, idEncoder, http.NewServeMux(), int64(maxSize), adminAuth, domains}
 	h.mux.HandleFunc("/favicon.ico", faviconHandler)
 	h.mux.HandleFunc("/api/create", h.handleUpload)
 	h.mux.HandleFunc("/", h.handleRecord)
@@ -240,10 +242,12 @@ func (h *Handler) handleMain(w http.ResponseWriter, r *http.Request) {
 		FileTab bool
 		MaxSize string
 		Uploads string
+		Domains []string
 	}{
 		FileTab: r.FormValue("filetab") == "on",
 		MaxSize: humanize.IBytes(uint64(h.maxSize)),
 		Uploads: humanize.Comma(h.db.RecordsCount()),
+		Domains: h.domains,
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := mainTemplate.Execute(w, vars); err != nil {

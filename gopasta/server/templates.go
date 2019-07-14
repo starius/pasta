@@ -28,7 +28,8 @@ h1, h2 {
 <link type="image/x-icon" rel="icon" href="/favicon.ico"/>
 </head>
 <body>
-<h1>Pasta</h1><form action="/api/create" method="POST" enctype="multipart/form-data">
+<h1>Pasta</h1>
+<form action="/api/create" method="POST" enctype="multipart/form-data" autocomplete="off">
 <table>
     <tr>
         <td>

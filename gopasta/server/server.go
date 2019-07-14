@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"mime"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -102,12 +104,20 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 		}
 		content = []byte(u.String())
 	}
+	ctype := ""
+	if !redirect {
+		ctype = mime.TypeByExtension(filepath.Ext(filename))
+		if ctype == "" {
+			ctype = http.DetectContentType(content)
+		}
+	}
 	record := &database.Record{
 		Content:     content,
 		Filename:    filename,
 		SelfBurning: selfBurning,
 		Redirect:    redirect,
 		LongId:      longID,
+		ContentType: ctype,
 	}
 	id, err := h.db.Add(record)
 	if err != nil {
@@ -197,6 +207,9 @@ func (h *Handler) handleRecord(w http.ResponseWriter, r *http.Request) {
 	} else {
 		if record.Filename != "" {
 			w.Header().Add("Content-Disposition", fmt.Sprintf("inline; filename=%q", record.Filename))
+		}
+		if record.ContentType != "" {
+			w.Header().Add("Content-Type", record.ContentType)
 		}
 		contentReader := bytes.NewReader(record.Content)
 		http.ServeContent(w, r, record.Filename, time.Unix(0, 0), contentReader)

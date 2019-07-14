@@ -8,5 +8,5 @@ message Record {
   bool self_burning = 3;
   bool redirect = 4;
   bool long_id = 5;
-  bool binary = 6;
+  string content_type = 6;
 }

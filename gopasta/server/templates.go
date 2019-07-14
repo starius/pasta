@@ -117,6 +117,6 @@ var uploadTemplate = template.Must(template.New("upload").Parse(`<!DOCTYPE HTML>
 <body>
 <h1>Pasta</h1>
 
-Your {{ if .SelfBurning }} one-time {{ end }} link: <a href="{{ .URL }}">{{ .URL }}</a>
+Your {{ if .SelfBurning }} one-time {{ end }} link: <a href="{{ .URL }}">{{ .HumanURL }}</a>
 
 </body></html>`))

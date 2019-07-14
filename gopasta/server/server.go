@@ -104,6 +104,11 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 		}
 		content = []byte(u.String())
 	}
+	if len(content) == 0 {
+		log.Printf("Empty content.")
+		http.Error(w, "Empty content.", http.StatusBadRequest)
+		return
+	}
 	ctype := ""
 	if !redirect {
 		ctype = mime.TypeByExtension(filepath.Ext(filename))

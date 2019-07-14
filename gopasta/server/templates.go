@@ -25,11 +25,38 @@ h1, h2 {
   margin-bottom: 5px;
 }
 </style>
+
 <link type="image/x-icon" rel="icon" href="/favicon.ico"/>
 </head>
 <body>
 <h1>Pasta</h1>
+
+<table>
+<tr>
+<td>
+  {{ if .FileTab }}<a href="/">{{end}}
+  Upload text
+  {{ if .FileTab }}</a>{{end}}
+</td>
+<td>
+  {{ if not .FileTab }}<a href="?filetab=on">{{end}}
+  Upload file
+  {{ if not .FileTab }}</a>{{end}}
+</td>
+</tr>
+</table>
+
 <form action="/api/create" method="POST" enctype="multipart/form-data" autocomplete="off">
+{{ if .FileTab }}
+  <br/>
+  Select a file:
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <input type="file" name="file" id="file">
+  <br/><br/>
+  Max size: {{.MaxSize}}
+  <br/><br/>
+  The name of the file will be available from the link.
+{{ else }}
 <table>
     <tr>
         <td>
@@ -41,12 +68,7 @@ h1, h2 {
     </tr>
 </table>
 <textarea cols="80" name="content" rows="24"></textarea>
-
-<br/><br/>
-or select a file: <input type="file" name="file" id="file">
-
-<br/>
-Max size: {{.MaxSize}}
+{{ end }}
 
 <br/><br/>
 <input type="checkbox" name="self_burning" id="self_burning"/>
@@ -54,18 +76,19 @@ Max size: {{.MaxSize}}
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="checkbox" name="long_id" id="long_id"/>
 <label for="long_id">Secure ID</label>
+{{ if not .FileTab }}
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="checkbox" name="redirect" id="redirect"/>
 <label for="redirect">URL shortener</label>
+{{ end }}
 
 <br/><br/>
 <input type="submit" value="Upload"/>
+<br/>
 </form>
 
-<br/><br/>
-If you upload a file, its name is available from the link.
+<br/>
 
-<br/><br/>
 {{.Uploads}} {{ if eq .Uploads "1" }} upload has {{ else }} uploads have {{ end }} been made.
 
 <br/><br/>

@@ -149,7 +149,21 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 	if !selfBurning && !redirect && contentTypeIsInline(ctype) {
 		http.Redirect(w, r, targetURL, http.StatusFound)
 	}
-	fmt.Fprintf(w, "Your link: %s\n", targetURL)
+	if r.FormValue("browser") != "on" {
+		fmt.Fprintf(w, "Your link: %s\n", targetURL)
+		return
+	}
+	vars := struct {
+		URL         string
+		SelfBurning bool
+	}{
+		URL:         targetURL,
+		SelfBurning: selfBurning,
+	}
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if err := uploadTemplate.Execute(w, vars); err != nil {
+		log.Printf("failed to execute upload template: %v", err)
+	}
 }
 
 func (h *Handler) handleRecord(w http.ResponseWriter, r *http.Request) {

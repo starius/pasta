@@ -141,7 +141,7 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 		host = r.Host
 	}
 	targetURL := fmt.Sprintf("%s://%s/%s", scheme, host, phrase)
-	if !selfBurning && !redirect {
+	if !selfBurning && !redirect && contentTypeIsInline(ctype) {
 		http.Redirect(w, r, targetURL, http.StatusFound)
 	}
 	fmt.Fprintf(w, "Your link: %s\n", targetURL)

@@ -72,14 +72,14 @@ h1, h2 {
 
 <br/><br/>
 <input type="checkbox" name="self_burning" id="self_burning"/>
-<label for="self_burning">Self-burning</label>
+<label for="self_burning" title="If you select this checkbox, the link will be destroyed after the first access.">Self-burning</label>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="checkbox" name="long_id" id="long_id"/>
-<label for="long_id">Secure ID</label>
+<label for="long_id" title="If you select this checkbox, the link will be long and very hard to guess or remember.">Secure ID</label>
 {{ if not .FileTab }}
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="checkbox" name="redirect" id="redirect"/>
-<label for="redirect">URL shortener</label>
+<label for="redirect" title="If you select this checkbox, the link will be a redirect to the URL you enter above.">URL shortener</label>
 {{ end }}
 
 <br/><br/>

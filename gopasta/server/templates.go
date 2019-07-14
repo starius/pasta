@@ -66,7 +66,7 @@ Max size: {{.MaxSize}}
 If you upload a file, its name is available from the link.
 
 <br/><br/>
-Number of uploads: {{.Uploads}}.
+{{.Uploads}} {{ if eq .Uploads "1" }} upload has {{ else }} uploads have {{ end }} been made.
 
 <br/><br/>
 Get the <a href="https://github.com/starius/pasta/tree/master/gopasta">source</a> of the site and install on your own server in 3 seconds: <code>go get github.com/starius/pasta/gopasta</code> .

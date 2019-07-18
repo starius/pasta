@@ -241,15 +241,19 @@ func (h *Handler) handleRecord(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) handleMain(w http.ResponseWriter, r *http.Request) {
 	vars := struct {
-		FileTab bool
-		MaxSize string
-		Uploads string
-		Domains []string
+		TextTab     bool
+		FileTab     bool
+		ShortnerTab bool
+		MaxSize     string
+		Uploads     string
+		Domains     []string
 	}{
-		FileTab: r.FormValue("filetab") == "on",
-		MaxSize: humanize.IBytes(uint64(h.maxSize)),
-		Uploads: humanize.Comma(h.db.RecordsCount()),
-		Domains: h.domains,
+		TextTab:     r.FormValue("tab") == "text" || r.FormValue("tab") == "",
+		FileTab:     r.FormValue("tab") == "file",
+		ShortnerTab: r.FormValue("tab") == "shortner",
+		MaxSize:     humanize.IBytes(uint64(h.maxSize)),
+		Uploads:     humanize.Comma(h.db.RecordsCount()),
+		Domains:     h.domains,
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := mainTemplate.Execute(w, vars); err != nil {

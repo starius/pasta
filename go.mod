@@ -13,4 +13,5 @@ require (
 	gitlab.com/starius/encrypt-autocert-cache v0.0.0-20190712210308-45f8d402b3eb
 	gitlab.com/starius/fpe v0.0.0-20181110234326-b113c8214a5f
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
+	golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3
 )

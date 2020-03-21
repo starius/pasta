@@ -41,22 +41,25 @@ func NewDatabase(index, data *os.File, indexBlock, dataBlock cipher.Block, maxSi
 	if err != nil {
 		return nil, err
 	}
-	lru, err := NewLRU(uint64(cacheRecords), uint64(cacheBytes))
-	if err != nil {
-		return nil, err
-	}
 	if err := deallocate.MakeSparse(data); err != nil {
 		return nil, fmt.Errorf("failed to mark file sparse: %v", err)
 	}
-	return &Database{
+	db := &Database{
 		index:    WrapInCTR(indexBlock, index),
 		data:     WrapInCTR(dataBlock, data),
 		rawData:  data,
 		indexLen: uint64(indexStat.Size()),
 		dataLen:  uint64(dataStat.Size()),
 		maxSize:  uint64(maxSize),
-		lru:      lru,
-	}, nil
+	}
+	if cacheRecords != 0 && cacheBytes != 0 {
+		lru, err := NewLRU(uint64(cacheRecords), uint64(cacheBytes))
+		if err != nil {
+			return nil, err
+		}
+		db.lru = lru
+	}
+	return db, nil
 }
 
 func recordSize(record *Record) uint64 {
@@ -97,14 +100,18 @@ func (d *Database) wipeData(dataBegin, dataEnd uint64) error {
 }
 
 func (d *Database) Lookup(key uint64) (*Record, error) {
+	if d.lru != nil {
+		d.mu.Lock()
+		r, has := d.lru.Get(key)
+		d.mu.Unlock()
+		if has {
+			return r, nil
+		}
+	}
 	d.mu.Lock()
-	r, has := d.lru.Get(key)
 	indexLen := d.indexLen
 	dataLen := d.dataLen
 	d.mu.Unlock()
-	if has {
-		return r, nil
-	}
 	dataBegin, dataEnd, err := d.getOffsets(key, indexLen, dataLen)
 	if err != nil {
 		return nil, err
@@ -125,7 +132,7 @@ func (d *Database) Lookup(key uint64) (*Record, error) {
 		if err := d.wipeData(dataBegin, dataEnd); err != nil {
 			return nil, err
 		}
-	} else {
+	} else if d.lru != nil {
 		d.mu.Lock()
 		d.lru.Set(key, &record, recordSize(&record))
 		d.mu.Unlock()
@@ -135,7 +142,9 @@ func (d *Database) Lookup(key uint64) (*Record, error) {
 
 func (d *Database) Delete(key uint64) error {
 	d.mu.Lock()
-	d.lru.DeleteIfExists(key)
+	if d.lru != nil {
+		d.lru.DeleteIfExists(key)
+	}
 	indexLen := d.indexLen
 	dataLen := d.dataLen
 	d.mu.Unlock()
@@ -164,7 +173,7 @@ func (d *Database) Add(record *Record) (uint64, error) {
 	key := indexLen / 8
 	dataLen := d.dataLen
 	d.dataLen += uint64(len(data))
-	if !record.SelfBurning {
+	if !record.SelfBurning && d.lru != nil {
 		d.lru.Set(key, record, recordSize(record))
 	}
 	d.mu.Unlock()

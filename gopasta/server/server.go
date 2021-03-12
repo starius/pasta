@@ -99,10 +99,15 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 		}
 		if !u.IsAbs() {
 			log.Printf("URL is not absolute.")
-			http.Error(w, "URL is  not absolute", http.StatusBadRequest)
+			http.Error(w, "URL is not absolute", http.StatusBadRequest)
 			return
 		}
 		content = []byte(u.String())
+		if len(content) > 1024 {
+			log.Printf("URL is too long.")
+			http.Error(w, "URL is too long", http.StatusBadRequest)
+			return
+		}
 	}
 	if len(content) == 0 {
 		log.Printf("Empty content.")

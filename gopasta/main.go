@@ -35,7 +35,8 @@ var (
 	secretFile   = flag.String("secret-file", "", "Secret file")
 	genSecret    = flag.Bool("gen-secret", false, "Generate random and exit")
 	printAdmin   = flag.Bool("print-admin-auth", false, "Print admin Authorization header and exit")
-	allowFiles   = flag.Bool("allow-files", false, "Allow binary files, not only texts")
+	allowFiles   = flag.Bool("allow-files", true, "Allow binary files, not only texts")
+	filesBurn    = flag.Bool("files-burn", false, "Binary files are forced to be self-burning")
 	maxSize      = flag.Int("max-size", 10*1024*1024, "Max record size, bytes")
 	cacheRecords = flag.Int("cache-records", 10000, "Cache size, records")
 	cacheBytes   = flag.Int("cache-bytes", 100*1024*1024, "Cache size, bytes")
@@ -161,7 +162,7 @@ func main() {
 	if len(domainsList[0]) == 0 {
 		domainsList = nil
 	}
-	handler := server.NewHandler(db, idEncoder, *maxSize, adminAuth, domainsList, *allowFiles)
+	handler := server.NewHandler(db, idEncoder, *maxSize, adminAuth, domainsList, *allowFiles, *filesBurn)
 
 	if *letsDomains != "" {
 		// Use Let's Encrypt.

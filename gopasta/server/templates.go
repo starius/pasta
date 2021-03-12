@@ -93,7 +93,7 @@ Enter URL:
 {{ end }}
 
 <br/><br/>
-<input type="checkbox" name="self_burning" id="self_burning"/>
+<input type="checkbox" name="self_burning" id="self_burning" {{ if .ForcedBurn }}checked onclick="return false;"{{ end }} />
 <label for="self_burning" title="If you select this checkbox, the link will be destroyed after the first access.">Self-burning</label>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="checkbox" name="long_id" id="long_id"/>

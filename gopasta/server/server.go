@@ -36,16 +36,17 @@ type Handler struct {
 	adminAuth  string
 	domains    []string
 	allowFiles bool
+	filesBurn  bool
 }
 
-func NewHandler(db *database.Database, idEncoder IDEncoder, maxSize int, adminAuth string, domains []string, allowFiles bool) *Handler {
+func NewHandler(db *database.Database, idEncoder IDEncoder, maxSize int, adminAuth string, domains []string, allowFiles, filesBurn bool) *Handler {
 	faviconReader := bytes.NewReader(MustAsset("favicon.ico"))
 	faviconHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "image/vnd.microsoft.icon")
 		http.ServeContent(w, r, "favicon.ico", time.Unix(0, 0), faviconReader)
 	}
 
-	h := &Handler{db, idEncoder, http.NewServeMux(), int64(maxSize), adminAuth, domains, allowFiles}
+	h := &Handler{db, idEncoder, http.NewServeMux(), int64(maxSize), adminAuth, domains, allowFiles, filesBurn}
 	h.mux.HandleFunc("/favicon.ico", faviconHandler)
 	h.mux.HandleFunc("/api/create", h.handleUpload)
 	h.mux.HandleFunc("/", h.handleRecord)
@@ -64,17 +65,20 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "bad method", http.StatusMethodNotAllowed)
 		return
 	}
+
 	r.Body = http.MaxBytesReader(w, r.Body, h.maxSize)
 	if err := r.ParseMultipartForm(h.maxSize); err != nil {
 		log.Printf("ParseMultipartForm: %v", err)
 		http.Error(w, "failed to parse the form", http.StatusBadRequest)
 		return
 	}
+
 	content := []byte(r.FormValue("content"))
 	filename := r.FormValue("filename")
 	selfBurning := r.FormValue("self_burning") != ""
 	redirect := r.FormValue("redirect") != ""
 	longID := r.FormValue("long_id") != ""
+
 	if file, header, err := r.FormFile("file"); err == nil {
 		if len(content) != 0 || filename != "" {
 			log.Printf("Provided both text content and file")
@@ -89,6 +93,7 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 		}
 		filename = header.Filename
 	}
+
 	if redirect {
 		content = bytes.TrimSpace(content)
 		u, err := url.Parse(string(content))
@@ -114,14 +119,7 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Empty content.", http.StatusBadRequest)
 		return
 	}
-	if !h.allowFiles {
-		// Verify it is UTF-8 text.
-		if !utf8.ValidString(string(content)) {
-			log.Printf("Invalid content.")
-			http.Error(w, "Invalid content.", http.StatusBadRequest)
-			return
-		}
-	}
+
 	ctype := ""
 	if !redirect {
 		ctype = mime.TypeByExtension(filepath.Ext(filename))
@@ -129,6 +127,25 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 			ctype = http.DetectContentType(content)
 		}
 	}
+
+	var validText bool
+	if !h.allowFiles || h.filesBurn {
+		// Check of the content is needed.
+		validText = utf8.ValidString(string(content))
+	}
+	if !h.allowFiles && !validText {
+		log.Printf("Invalid content.")
+		http.Error(w, "Invalid content.", http.StatusBadRequest)
+		return
+	}
+	if h.filesBurn && !validText {
+		// In filesBurn mode all files are forced self-burning.
+		selfBurning = true
+	}
+	if h.filesBurn && !selfBurning {
+		ctype = "text/plain; charset=utf-8"
+	}
+
 	record := &database.Record{
 		Content:     content,
 		Filename:    filename,
@@ -143,6 +160,7 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "failed to save the record", http.StatusInternalServerError)
 		return
 	}
+
 	phrase, err := h.idEncoder.Encode(id, longID)
 	if err != nil {
 		log.Printf("idEncoder.Encode: %v.", err)
@@ -162,10 +180,12 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 	if !selfBurning && !redirect && contentTypeIsInline(ctype) {
 		http.Redirect(w, r, targetURL, http.StatusFound)
 	}
+
 	if r.FormValue("browser") != "on" {
 		fmt.Fprintf(w, "Your link: %s\n", targetURL)
 		return
 	}
+
 	vars := struct {
 		URL         string
 		HumanURL    string
@@ -256,6 +276,7 @@ func (h *Handler) handleMain(w http.ResponseWriter, r *http.Request) {
 		AllowFiles  bool
 		FileTab     bool
 		ShortnerTab bool
+		ForcedBurn  bool
 		MaxSize     string
 		Uploads     string
 		Domains     []string
@@ -268,6 +289,7 @@ func (h *Handler) handleMain(w http.ResponseWriter, r *http.Request) {
 		Uploads:     humanize.Comma(h.db.RecordsCount()),
 		Domains:     h.domains,
 	}
+	vars.ForcedBurn = h.filesBurn && vars.FileTab
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := mainTemplate.Execute(w, vars); err != nil {
 		log.Printf("failed to execute template: %v", err)

@@ -41,11 +41,13 @@ var mainTemplate = template.Must(template.New("main").Parse(`<!DOCTYPE HTML><htm
   Upload text
   {{ if not .TextTab }}</a>{{end}}
 </td>
+{{ if .AllowFiles }}
 <td>
   {{ if not .FileTab }}<a href="?tab=file">{{end}}
   Upload file
   {{ if not .FileTab }}</a>{{end}}
 </td>
+{{end}}
 <td>
   {{ if not .ShortnerTab }}<a href="?tab=shortner">{{end}}
   URL shortner

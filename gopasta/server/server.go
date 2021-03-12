@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/robfig/humanize"
 	"github.com/starius/pasta/gopasta/database"
@@ -28,26 +29,23 @@ type IDEncoder interface {
 }
 
 type Handler struct {
-	db        *database.Database
-	idEncoder IDEncoder
-
-	mux *http.ServeMux
-
-	maxSize int64
-
-	adminAuth string
-
-	domains []string
+	db         *database.Database
+	idEncoder  IDEncoder
+	mux        *http.ServeMux
+	maxSize    int64
+	adminAuth  string
+	domains    []string
+	allowFiles bool
 }
 
-func NewHandler(db *database.Database, idEncoder IDEncoder, maxSize int, adminAuth string, domains []string) *Handler {
+func NewHandler(db *database.Database, idEncoder IDEncoder, maxSize int, adminAuth string, domains []string, allowFiles bool) *Handler {
 	faviconReader := bytes.NewReader(MustAsset("favicon.ico"))
 	faviconHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "image/vnd.microsoft.icon")
 		http.ServeContent(w, r, "favicon.ico", time.Unix(0, 0), faviconReader)
 	}
 
-	h := &Handler{db, idEncoder, http.NewServeMux(), int64(maxSize), adminAuth, domains}
+	h := &Handler{db, idEncoder, http.NewServeMux(), int64(maxSize), adminAuth, domains, allowFiles}
 	h.mux.HandleFunc("/favicon.ico", faviconHandler)
 	h.mux.HandleFunc("/api/create", h.handleUpload)
 	h.mux.HandleFunc("/", h.handleRecord)
@@ -110,6 +108,14 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Empty content.")
 		http.Error(w, "Empty content.", http.StatusBadRequest)
 		return
+	}
+	if !h.allowFiles {
+		// Verify it is UTF-8 text.
+		if !utf8.ValidString(string(content)) {
+			log.Printf("Invalid content.")
+			http.Error(w, "Invalid content.", http.StatusBadRequest)
+			return
+		}
 	}
 	ctype := ""
 	if !redirect {
@@ -242,6 +248,7 @@ func (h *Handler) handleRecord(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) handleMain(w http.ResponseWriter, r *http.Request) {
 	vars := struct {
 		TextTab     bool
+		AllowFiles  bool
 		FileTab     bool
 		ShortnerTab bool
 		MaxSize     string
@@ -249,6 +256,7 @@ func (h *Handler) handleMain(w http.ResponseWriter, r *http.Request) {
 		Domains     []string
 	}{
 		TextTab:     r.FormValue("tab") == "text" || r.FormValue("tab") == "",
+		AllowFiles:  h.allowFiles,
 		FileTab:     r.FormValue("tab") == "file",
 		ShortnerTab: r.FormValue("tab") == "shortner",
 		MaxSize:     humanize.IBytes(uint64(h.maxSize)),

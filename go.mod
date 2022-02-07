@@ -3,7 +3,6 @@ module github.com/starius/pasta
 go 1.12
 
 require (
-	github.com/golang/protobuf v1.5.2
 	github.com/golang/snappy v0.0.4
 	github.com/robfig/humanize v0.0.0-20130801072920-4123e5c9f2f9
 	github.com/tyler-smith/go-bip39 v1.1.0

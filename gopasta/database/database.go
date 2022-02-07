@@ -8,9 +8,9 @@ import (
 	"os"
 	"sync"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/golang/snappy"
 	"gitlab.com/starius/deallocate"
+	"google.golang.org/protobuf/proto"
 )
 
 //go:generate protoc --proto_path=. --go_out=. record.proto

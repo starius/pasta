@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"crypto/aes"
 	"crypto/sha256"
+	"crypto/tls"
 	"encoding/hex"
 	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"strings"
@@ -18,7 +20,7 @@ import (
 	"github.com/starius/pasta/gopasta/database"
 	"github.com/starius/pasta/gopasta/server"
 	"github.com/tyler-smith/go-bip39/wordlists"
-	"gitlab.com/NebulousLabs/entropy-mnemonics"
+	mnemonics "gitlab.com/NebulousLabs/entropy-mnemonics"
 	"gitlab.com/NebulousLabs/fastrand"
 	"gitlab.com/starius/encrypt-autocert-cache"
 	"gitlab.com/starius/fpe/phrase"
@@ -185,12 +187,21 @@ func main() {
 			HostPolicy: autocert.HostWhitelist(letsDomainsList...),
 		}
 		certHandler := m.HTTPHandler(http.HandlerFunc(redirectToHTTPS))
-		listener := m.Listener()
+		tlsConfig := m.TLSConfig()
+		tlsConfig.MinVersion = tls.VersionTLS12
+		ln := &listener{
+			conf: tlsConfig,
+		}
+		tcpLn, err := net.Listen("tcp", ":443")
+		if err != nil {
+			log.Fatal(err)
+		}
+		ln.tcpListener = tcpLn
 		go func() {
 			log.Fatal(http.ListenAndServe(":80", certHandler))
 		}()
 		go func() {
-			log.Fatal(http.Serve(listener, handler))
+			log.Fatal(http.Serve(ln, handler))
 		}()
 	}
 

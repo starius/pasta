@@ -11,8 +11,7 @@ require (
 	gitlab.com/starius/deallocate v0.0.0-20190713141632-605b24537969
 	gitlab.com/starius/encrypt-autocert-cache v0.0.0-20190712210308-45f8d402b3eb
 	gitlab.com/starius/fpe v0.0.0-20181110234326-b113c8214a5f
-	golang.org/x/crypto v0.0.0-20220131195533-30dcbda58838
-	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd
-	golang.org/x/sys v0.0.0-20220204135822-1c1b9b1eba6a // indirect
-	google.golang.org/protobuf v1.27.1
+	golang.org/x/crypto v0.6.0
+	golang.org/x/net v0.7.0
+	google.golang.org/protobuf v1.28.1
 )

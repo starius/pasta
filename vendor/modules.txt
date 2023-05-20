@@ -15,28 +15,28 @@ gitlab.com/starius/encrypt-autocert-cache
 # gitlab.com/starius/fpe v0.0.0-20181110234326-b113c8214a5f
 gitlab.com/starius/fpe
 gitlab.com/starius/fpe/phrase
-# golang.org/x/crypto v0.6.0
+# golang.org/x/crypto v0.9.0
 golang.org/x/crypto/acme
 golang.org/x/crypto/acme/autocert
 golang.org/x/crypto/blake2b
 golang.org/x/crypto/hkdf
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/net v0.7.0
+# golang.org/x/net v0.10.0
 golang.org/x/net/idna
-# golang.org/x/sys v0.5.0
+# golang.org/x/sys v0.8.0
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/plan9
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/term v0.5.0
+# golang.org/x/term v0.8.0
 golang.org/x/term
-# golang.org/x/text v0.7.0
+# golang.org/x/text v0.9.0
 golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
-# google.golang.org/protobuf v1.28.1
+# google.golang.org/protobuf v1.30.0
 google.golang.org/protobuf/encoding/prototext
 google.golang.org/protobuf/encoding/protowire
 google.golang.org/protobuf/internal/descfmt

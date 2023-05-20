@@ -104,7 +104,7 @@ func main() {
 	}
 	adminAuth := hex.EncodeToString(adminAuthBytes)
 	if *printAdmin {
-		fmt.Println(adminAuth)
+		fmt.Printf("curl -X DELETE -H 'Authorization: %s' URL-to-delete\n", adminAuth)
 		os.Exit(0)
 	}
 

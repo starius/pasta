@@ -51,7 +51,7 @@ curl -X DELETE -H 'Authorization: 482b2ed338e8107d5a0010d90ecbfb21' URL-to-delet
 ```
 
 Write down the template of curl command and keep it secretly.
-In case you need quickly remove a record, replace `URL-to-delete` with
+In case you need to quickly remove a record, replace `URL-to-delete` with
 actual URL of the record and run the command.
 
 Now let's run the site!
@@ -93,6 +93,12 @@ If this doesn't work, allow any binary to bind any port >= 80 using this command
 ```
 sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80
 ```
+
+The binary will run the site on the following ports:
+
+ - https://0.0.0.0:443 - externally available HTTPS site
+ - http://0.0.0.0:80 - externally available HTTP server, redirecting to HTTPS site
+ - http://127.0.0.1:8042 - the site available locally and used by onion site
 
 To add onion mirror, [create an onion site](https://community.torproject.org/onion-services/setup/)
 in torrc config and point its 80 port to 127.0.0.1:8042:

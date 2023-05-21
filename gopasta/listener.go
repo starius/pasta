@@ -28,8 +28,12 @@ func (ln *listener) Accept() (net.Conn, error) {
 	// way and tweak as needed. But this is what net/http does
 	// itself, so copy that. If net/http changes, we can change
 	// here too.
-	tcpConn.SetKeepAlive(true)
-	tcpConn.SetKeepAlivePeriod(3 * time.Minute)
+	if err := tcpConn.SetKeepAlive(true); err != nil {
+		return nil, err
+	}
+	if err := tcpConn.SetKeepAlivePeriod(3 * time.Minute); err != nil {
+		return nil, err
+	}
 
 	return tls.Server(tcpConn, ln.conf), nil
 }

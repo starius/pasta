@@ -26,7 +26,7 @@ import (
 	"gitlab.com/starius/fpe/phrase"
 	"golang.org/x/crypto/acme/autocert"
 	"golang.org/x/crypto/hkdf"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 var (
@@ -81,7 +81,7 @@ func main() {
 		}
 	} else {
 		fmt.Print("Enter secret: ")
-		secret, err = terminal.ReadPassword(int(syscall.Stdin))
+		secret, err = term.ReadPassword(int(syscall.Stdin))
 		fmt.Println()
 		if err != nil {
 			log.Fatalf("Failed to read secret from keyboard")

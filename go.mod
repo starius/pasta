@@ -13,5 +13,6 @@ require (
 	gitlab.com/starius/fpe v0.0.0-20181110234326-b113c8214a5f
 	golang.org/x/crypto v0.9.0
 	golang.org/x/net v0.10.0
+	golang.org/x/term v0.8.0
 	google.golang.org/protobuf v1.30.0
 )

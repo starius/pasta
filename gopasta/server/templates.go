@@ -132,4 +132,52 @@ var uploadTemplate = template.Must(template.New("upload").Parse(`<!DOCTYPE HTML>
 
 Your {{ if .SelfBurning }} one-time {{ end }} link: <a href="{{ .URL }}">{{ .HumanURL }}</a>
 
+<br/><br/>
+
+Pasta ID: <span id="pasta-id" style="font-family: monospace; background-color: LightGray; padding: 5px; border-radius: 3px; cursor: pointer;">{{ .ID }}</span>
+<span id="copied" style="visibility: hidden; background-color: black; color: white; border-radius: 10px; padding: 5px;">Copied!</span>
+
+<script>
+function copyTextToClipboard(text, successHandler) {
+  var textArea = document.createElement("textarea");
+  textArea.style.position = 'fixed';
+  textArea.style.top = 0;
+  textArea.style.left = 0;
+  textArea.style.width = '2em';
+  textArea.style.height = '2em';
+  textArea.style.padding = 0;
+  textArea.style.border = 'none';
+  textArea.style.outline = 'none';
+  textArea.style.boxShadow = 'none';
+  textArea.style.background = 'transparent';
+  textArea.value = text;
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  var successful = false;
+  try {
+    successful = document.execCommand('copy');
+    var msg = successful ? 'successful' : 'unsuccessful';
+    console.log('Copying text command was ' + msg);
+  } catch (err) {
+    console.log('Oops, unable to copy');
+  }
+  document.body.removeChild(textArea);
+  if (successful) {
+    successHandler();
+  }
+}
+
+document.querySelector('#pasta-id').addEventListener('click', function(event) {
+  copyTextToClipboard('{{ .ID }}', function() {
+    document.getElementById("copied").style.visibility = "visible";
+     setTimeout(function(){
+       document.getElementById("copied").style.visibility = "hidden";
+     }, 1500);
+  });
+});
+</script>
+
 </body></html>`))
+
+// JS code copied from https://stackoverflow.com/a/30810322

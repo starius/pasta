@@ -189,10 +189,12 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 	vars := struct {
 		URL         string
 		HumanURL    string
+		ID          string
 		SelfBurning bool
 	}{
 		URL:         targetURL,
 		HumanURL:    fmt.Sprintf("%s/%s", host, phrase),
+		ID:          phrase,
 		SelfBurning: selfBurning,
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")

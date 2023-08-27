@@ -16,12 +16,9 @@ import (
 
 	"github.com/robfig/humanize"
 	"github.com/starius/pasta/gopasta/database"
+	"github.com/starius/pasta/src/static/pasta"
 	"golang.org/x/net/idna"
 )
-
-//go:generate go get github.com/jteeuwen/go-bindata/go-bindata
-//go:generate go-bindata -pkg server -nometadata -nomemcopy -nocompress -prefix $GOPATH/src/github.com/starius/pasta/gopasta/server -o $GOPATH/src/github.com/starius/pasta/gopasta/server/favicon.go $GOPATH/src/github.com/starius/pasta/gopasta/server/favicon.ico
-//go:generate go fmt $GOPATH/src/github.com/starius/pasta/gopasta/server/favicon.go
 
 type IDEncoder interface {
 	Encode(id uint64, longID bool) (phrase string, err error)
@@ -40,7 +37,7 @@ type Handler struct {
 }
 
 func NewHandler(db *database.Database, idEncoder IDEncoder, maxSize int, adminAuth string, domains []string, allowFiles, filesBurn bool) *Handler {
-	faviconReader := bytes.NewReader(MustAsset("favicon.ico"))
+	faviconReader := bytes.NewReader(pasta.FaviconBytes)
 	faviconHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "image/vnd.microsoft.icon")
 		http.ServeContent(w, r, "favicon.ico", time.Unix(0, 0), faviconReader)

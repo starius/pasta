@@ -2,6 +2,8 @@
 
 set -xue
 
+go get -t ./...
+
 for os in linux windows darwin; do
     for arch in 386 amd64 arm64; do
         if [[ "$os/$arch" == "darwin/386" ]]; then

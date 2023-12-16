@@ -3,7 +3,9 @@ package server
 import (
 	"bytes"
 	"crypto/subtle"
+	"embed"
 	"fmt"
+	"html/template"
 	"io/ioutil"
 	"log"
 	"mime"
@@ -20,6 +22,9 @@ import (
 	"golang.org/x/net/idna"
 )
 
+//go:embed *.html
+var templatesFs embed.FS
+
 type IDEncoder interface {
 	Encode(id uint64, longID bool) (phrase string, err error)
 	Decode(phrase string) (id uint64, longID bool, err error)
@@ -29,6 +34,8 @@ type Handler struct {
 	db         *database.Database
 	idEncoder  IDEncoder
 	mux        *http.ServeMux
+	mainTmpl   *template.Template
+	uploadTmpl *template.Template
 	maxSize    int64
 	adminAuth  string
 	domains    []string
@@ -43,10 +50,23 @@ func NewHandler(db *database.Database, idEncoder IDEncoder, maxSize int, adminAu
 		http.ServeContent(w, r, "favicon.ico", time.Unix(0, 0), faviconReader)
 	}
 
-	h := &Handler{db, idEncoder, http.NewServeMux(), int64(maxSize), adminAuth, domains, allowFiles, filesBurn}
+	h := &Handler{
+		db:         db,
+		idEncoder:  idEncoder,
+		mux:        http.NewServeMux(),
+		mainTmpl:   template.Must(template.ParseFS(templatesFs, "index.html", "base.html")),
+		uploadTmpl: template.Must(template.ParseFS(templatesFs, "upload.html", "base.html")),
+		maxSize:    int64(maxSize),
+		adminAuth:  adminAuth,
+		domains:    domains,
+		allowFiles: allowFiles,
+		filesBurn:  filesBurn,
+	}
+
 	h.mux.HandleFunc("/favicon.ico", faviconHandler)
 	h.mux.HandleFunc("/api/create", h.handleUpload)
 	h.mux.HandleFunc("/", h.handleRecord)
+
 	return h
 }
 
@@ -195,7 +215,7 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 		SelfBurning: selfBurning,
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if err := uploadTemplate.Execute(w, vars); err != nil {
+	if err := h.uploadTmpl.Execute(w, vars); err != nil {
 		log.Printf("failed to execute upload template: %v", err)
 	}
 }
@@ -290,7 +310,7 @@ func (h *Handler) handleMain(w http.ResponseWriter, r *http.Request) {
 	}
 	vars.ForcedBurn = h.filesBurn && vars.FileTab
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if err := mainTemplate.Execute(w, vars); err != nil {
+	if err := h.mainTmpl.Execute(w, vars); err != nil {
 		log.Printf("failed to execute template: %v", err)
 	}
 }

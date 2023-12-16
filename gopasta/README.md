@@ -10,7 +10,7 @@ Below are instructions on how to run your own instance.
 
 Install Go: https://go.dev/doc/install
 
-You need at least version 1.17.
+You need at least version 1.19.
 
 To download the code and build the binary, use the following command:
 ```
@@ -20,9 +20,18 @@ $ go install github.com/starius/pasta/gopasta@latest
 Some optional modifications:
 
  - add `-ldflags="-w -s"` after `install` to reduce the size of the binary
+ - add `-trimpath` and `-ldflags="-buildid="` to reduce make the binary build reproducible
  - set `CGO_ENABLED=0` environment variable to make the binary static
 
 It will put the binary to `$GOPATH/bin` directory, which is in most setups in `~/go/bin` directory.
+
+Alternatively you can checkout the repo and build binary in the current dir:
+
+```
+$ git clone https://github.com/starius/pasta
+$ cd pasta/gopasta
+$ CGO_ENABLED=0 go build -trimpath -ldflags="-s -w -buildid=" -o gopasta
+```
 
 The binary is self-contained, so if needed you can move it to another machine
 with the same OS and CPU architecture and run there.

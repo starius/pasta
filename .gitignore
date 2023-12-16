@@ -1,3 +1,6 @@
+# Release binaries
+gopasta/gopasta-*
+
 # Compiled Lua sources
 luac.out
 

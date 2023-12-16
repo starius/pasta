@@ -33,6 +33,10 @@ $ cd pasta/gopasta
 $ CGO_ENABLED=0 go build -trimpath -ldflags="-s -w -buildid=" -o gopasta
 ```
 
+Run `./release.sh` to produce release binaries in the current directory.
+They should match the ones in https://github.com/starius/pasta/releases
+for the given Go version and this package version.
+
 The binary is self-contained, so if needed you can move it to another machine
 with the same OS and CPU architecture and run there.
 

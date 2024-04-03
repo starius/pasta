@@ -1,0 +1,16 @@
+dist: jammy
+language: python
+python: 3.11.0
+
+install: 
+- pip3 install jsonschema pytest
+- npm install pacote@11.1.11
+
+script:
+- set -e
+- py.test -vv
+- python3 validate.py  
+- php validate.php
+- git checkout .
+- npm version `node -e 'pacote=require("pacote");pacote.manifest("crawler-user-agents").then(pkgJson => { console.log(pkgJson.version); });'`
+- npm version patch

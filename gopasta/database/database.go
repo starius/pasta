@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/golang/snappy"
+	"github.com/monperrus/crawler-user-agents"
 	"gitlab.com/starius/deallocate"
 	"google.golang.org/protobuf/proto"
 )
@@ -99,7 +100,7 @@ func (d *Database) wipeData(dataBegin, dataEnd uint64) error {
 	return deallocate.PunchHoleWithFallback(d.rawData, int64(dataBegin), int64(dataEnd-dataBegin))
 }
 
-func (d *Database) Lookup(key uint64) (*Record, error) {
+func (d *Database) Lookup(key uint64, userAgent string) (*Record, error) {
 	if d.lru != nil {
 		d.mu.Lock()
 		r, has := d.lru.Get(key)
@@ -129,6 +130,9 @@ func (d *Database) Lookup(key uint64) (*Record, error) {
 		return nil, err
 	}
 	if record.SelfBurning {
+		if agents.IsCrawler(userAgent) {
+			return nil, fmt.Errorf("preventing link burning by a crawler")
+		}
 		if err := d.wipeData(dataBegin, dataEnd); err != nil {
 			return nil, err
 		}

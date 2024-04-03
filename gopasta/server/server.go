@@ -260,7 +260,7 @@ func (h *Handler) handleRecord(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	record, err := h.db.Lookup(id)
+	record, err := h.db.Lookup(id, r.UserAgent())
 	if err != nil {
 		log.Printf("db.Lookup(%d): %v.", id, err)
 		http.Error(w, "bad link", http.StatusBadRequest)

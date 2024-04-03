@@ -40,6 +40,26 @@ for the given Go version and this package version.
 The binary is self-contained, so if needed you can move it to another machine
 with the same OS and CPU architecture and run there.
 
+### Using C++ RE2
+
+If you send a one time link in some chat (e.g. discord), its crawler will try to
+load link preview and would [expire the link][issue8], if not the protection
+that we have. The crawlers are detected and blocked in one-time links, so they
+do not expire. Regular expressions matching against all the crawlers User Agent
+strings is done using [go-re2](https://github.com/wasilibs/go-re2) library which
+is very fast. To make this matching even faster (~3 times), you can build
+against C++ version of RE2 library:
+
+```
+sudo apt-get install libre2-dev
+go build -trimpath -ldflags="-s -w -buildid=" -tags re2_cgo -o gopasta
+```
+
+The library is linked dynamically, so it has to be installed on the system
+on which it is run.
+
+[issue8]: https://github.com/starius/pasta/issues/8
+
 ## Run it on server
 
 First generate encryption password:

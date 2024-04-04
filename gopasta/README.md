@@ -52,6 +52,7 @@ against C++ version of RE2 library:
 
 ```
 sudo apt-get install libre2-dev
+sudo apt-get install build-essential pkg-config
 go build -trimpath -ldflags="-s -w -buildid=" -tags re2_cgo -o gopasta
 ```
 

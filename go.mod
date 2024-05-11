@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/golang/snappy v0.0.4
-	github.com/monperrus/crawler-user-agents v0.0.0-20240318174549-34394c34536e
+	github.com/monperrus/crawler-user-agents v0.0.0-20240503050501-e7a5674acc86
 	github.com/robfig/humanize v0.0.0-20130801072920-4123e5c9f2f9
 	github.com/tyler-smith/go-bip39 v1.1.0
 	gitlab.com/NebulousLabs/entropy-mnemonics v0.0.0-20181018051301-7532f67e3500
@@ -19,12 +19,6 @@ require (
 )
 
 require (
-	github.com/magefile/mage v1.14.0 // indirect
-	github.com/tetratelabs/wazero v1.7.0 // indirect
-	github.com/wasilibs/go-re2 v1.5.1 // indirect
 	golang.org/x/sys v0.20.0 // indirect
 	golang.org/x/text v0.15.0 // indirect
 )
-
-// Remove when https://github.com/monperrus/crawler-user-agents/pull/348 is merged
-replace github.com/monperrus/crawler-user-agents => github.com/starius/crawler-user-agents v0.0.2

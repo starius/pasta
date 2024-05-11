@@ -9,7 +9,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -75,7 +74,7 @@ func main() {
 	var err error
 	var secret []byte
 	if *secretFile != "" {
-		secret, err = ioutil.ReadFile(*secretFile)
+		secret, err = os.ReadFile(*secretFile)
 		if err != nil {
 			log.Fatalf("Failed to read secret file")
 		}

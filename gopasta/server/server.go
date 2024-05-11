@@ -6,7 +6,7 @@ import (
 	"embed"
 	"fmt"
 	"html/template"
-	"io/ioutil"
+	"io"
 	"log"
 	"mime"
 	"net/http"
@@ -102,7 +102,7 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Provided both text content and file", http.StatusBadRequest)
 			return
 		}
-		content, err = ioutil.ReadAll(file)
+		content, err = io.ReadAll(file)
 		if err != nil {
 			log.Printf("Reading multipart file: %v.", err)
 			http.Error(w, "Failed to read the file", http.StatusBadRequest)

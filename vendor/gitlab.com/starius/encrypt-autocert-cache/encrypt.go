@@ -4,12 +4,12 @@ import (
 	"context"
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
 	"io"
 
-	"gitlab.com/NebulousLabs/fastrand"
 	"golang.org/x/crypto/acme/autocert"
 	"golang.org/x/crypto/hkdf"
 )
@@ -81,7 +81,11 @@ func (c *EncryptedCache) Put(ctx context.Context, key string, data []byte) error
 	keyHash := c.hashKey(key)
 
 	nonceSize := c.valueAEAD.NonceSize()
-	nonce := fastrand.Bytes(nonceSize)
+	nonce := make([]byte, nonceSize)
+	if _, err := rand.Read(nonce); err != nil {
+		return fmt.Errorf("rand.Read failed: %w", err)
+	}
+
 	// Append the ciphertext to nonce.
 	encryptedValue := c.valueAEAD.Seal(nonce, nonce, data, []byte(keyHash))
 

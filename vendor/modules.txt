@@ -70,14 +70,14 @@ gitlab.com/NebulousLabs/fastrand
 # gitlab.com/starius/deallocate v0.0.0-20190713141632-605b24537969
 ## explicit
 gitlab.com/starius/deallocate
-# gitlab.com/starius/encrypt-autocert-cache v0.0.0-20190712210308-45f8d402b3eb
-## explicit
+# gitlab.com/starius/encrypt-autocert-cache v0.1.2
+## explicit; go 1.19
 gitlab.com/starius/encrypt-autocert-cache
 # gitlab.com/starius/fpe v0.0.0-20181110234326-b113c8214a5f
 ## explicit
 gitlab.com/starius/fpe
 gitlab.com/starius/fpe/phrase
-# golang.org/x/crypto v0.21.0
+# golang.org/x/crypto v0.23.0
 ## explicit; go 1.18
 golang.org/x/crypto/acme
 golang.org/x/crypto/acme/autocert
@@ -86,16 +86,16 @@ golang.org/x/crypto/hkdf
 # golang.org/x/net v0.23.0
 ## explicit; go 1.18
 golang.org/x/net/idna
-# golang.org/x/sys v0.18.0
+# golang.org/x/sys v0.20.0
 ## explicit; go 1.18
 golang.org/x/sys/cpu
 golang.org/x/sys/plan9
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/term v0.18.0
+# golang.org/x/term v0.20.0
 ## explicit; go 1.18
 golang.org/x/term
-# golang.org/x/text v0.14.0
+# golang.org/x/text v0.15.0
 ## explicit; go 1.18
 golang.org/x/text/secure/bidirule
 golang.org/x/text/transform

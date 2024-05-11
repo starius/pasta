@@ -10,11 +10,11 @@ require (
 	gitlab.com/NebulousLabs/entropy-mnemonics v0.0.0-20181018051301-7532f67e3500
 	gitlab.com/NebulousLabs/fastrand v0.0.0-20181126182046-603482d69e40
 	gitlab.com/starius/deallocate v0.0.0-20190713141632-605b24537969
-	gitlab.com/starius/encrypt-autocert-cache v0.0.0-20190712210308-45f8d402b3eb
+	gitlab.com/starius/encrypt-autocert-cache v0.1.2
 	gitlab.com/starius/fpe v0.0.0-20181110234326-b113c8214a5f
-	golang.org/x/crypto v0.21.0
+	golang.org/x/crypto v0.23.0
 	golang.org/x/net v0.23.0
-	golang.org/x/term v0.18.0
+	golang.org/x/term v0.20.0
 	google.golang.org/protobuf v1.33.0
 )
 
@@ -22,8 +22,8 @@ require (
 	github.com/magefile/mage v1.14.0 // indirect
 	github.com/tetratelabs/wazero v1.7.0 // indirect
 	github.com/wasilibs/go-re2 v1.5.1 // indirect
-	golang.org/x/sys v0.18.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/text v0.15.0 // indirect
 )
 
 // Remove when https://github.com/monperrus/crawler-user-agents/pull/348 is merged

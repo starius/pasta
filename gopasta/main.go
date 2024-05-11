@@ -189,14 +189,14 @@ func main() {
 		certHandler := m.HTTPHandler(http.HandlerFunc(redirectToHTTPS))
 		tlsConfig := m.TLSConfig()
 		tlsConfig.MinVersion = tls.VersionTLS12
-		ln := &listener{
-			conf: tlsConfig,
-		}
 		tcpLn, err := net.Listen("tcp", ":443")
 		if err != nil {
 			log.Fatal(err)
 		}
-		ln.tcpListener = tcpLn
+		ln, err := encrypt.NewListener(tlsConfig, tcpLn)
+		if err != nil {
+			log.Fatal(err)
+		}
 		go func() {
 			log.Fatal(http.ListenAndServe(":80", certHandler))
 		}()

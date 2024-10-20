@@ -1,8 +1,8 @@
 github.com/golang/snappy v0.0.4 h1:yAGX7huGHXlcLOEtBnF4w7FQwA26wojNCwOYAEhLjQM=
 github.com/golang/snappy v0.0.4/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
 github.com/google/go-cmp v0.5.5 h1:Khx7svrCpmxxtHBq5j2mp/xVjsi8hQMfNLvJFAlrGgU=
-github.com/monperrus/crawler-user-agents v0.0.0-20240503050501-e7a5674acc86 h1:eQfkoethZLP+9b9YdH2P/z1fKdec1cgHhTIEMbquFRk=
-github.com/monperrus/crawler-user-agents v0.0.0-20240503050501-e7a5674acc86/go.mod h1:GfRyKbsbxSrRxTPYnVi4U/0stQd6BcFCxDy6i6IxQ0M=
+github.com/monperrus/crawler-user-agents v0.0.0-20241019063900-292f566a4d21 h1:2FVJL72Q5K7sV15G+zUrzhU3ObK2E4ulPtP7mswVcqw=
+github.com/monperrus/crawler-user-agents v0.0.0-20241019063900-292f566a4d21/go.mod h1:GfRyKbsbxSrRxTPYnVi4U/0stQd6BcFCxDy6i6IxQ0M=
 github.com/robfig/humanize v0.0.0-20130801072920-4123e5c9f2f9 h1:ox2YYDFeBLtX+ppK/wsDCdIjxiyrb9N+nZUzutCwSkc=
 github.com/robfig/humanize v0.0.0-20130801072920-4123e5c9f2f9/go.mod h1:22cALbnMi4X46KeLCD6AD0kHX9bX4MBXvKEEOvrNiKc=
 github.com/tyler-smith/go-bip39 v1.1.0 h1:5eUemwrMargf3BSLRRCalXT93Ns6pQJIjYQN2nyfOP8=

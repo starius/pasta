@@ -1,7 +1,7 @@
 # github.com/golang/snappy v0.0.4
 ## explicit
 github.com/golang/snappy
-# github.com/monperrus/crawler-user-agents v0.0.0-20240503050501-e7a5674acc86
+# github.com/monperrus/crawler-user-agents v0.0.0-20241019063900-292f566a4d21
 ## explicit; go 1.19
 github.com/monperrus/crawler-user-agents
 # github.com/robfig/humanize v0.0.0-20130801072920-4123e5c9f2f9

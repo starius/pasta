@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/golang/snappy v0.0.4
-	github.com/monperrus/crawler-user-agents v0.0.0-20241019063900-292f566a4d21
+	github.com/monperrus/crawler-user-agents v0.0.0-20241021052531-8cce9afae9c7
 	github.com/robfig/humanize v0.0.0-20130801072920-4123e5c9f2f9
 	github.com/tyler-smith/go-bip39 v1.1.0
 	gitlab.com/NebulousLabs/entropy-mnemonics v0.0.0-20181018051301-7532f67e3500

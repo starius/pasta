@@ -26,32 +26,32 @@ gitlab.com/starius/encrypt-autocert-cache
 ## explicit
 gitlab.com/starius/fpe
 gitlab.com/starius/fpe/phrase
-# golang.org/x/crypto v0.23.0
-## explicit; go 1.18
+# golang.org/x/crypto v0.28.0
+## explicit; go 1.20
 golang.org/x/crypto/acme
 golang.org/x/crypto/acme/autocert
 golang.org/x/crypto/blake2b
 golang.org/x/crypto/hkdf
-# golang.org/x/net v0.25.0
+# golang.org/x/net v0.30.0
 ## explicit; go 1.18
 golang.org/x/net/idna
-# golang.org/x/sys v0.20.0
+# golang.org/x/sys v0.26.0
 ## explicit; go 1.18
 golang.org/x/sys/cpu
 golang.org/x/sys/plan9
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/term v0.20.0
+# golang.org/x/term v0.25.0
 ## explicit; go 1.18
 golang.org/x/term
-# golang.org/x/text v0.15.0
+# golang.org/x/text v0.19.0
 ## explicit; go 1.18
 golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
-# google.golang.org/protobuf v1.34.1
-## explicit; go 1.17
+# google.golang.org/protobuf v1.35.1
+## explicit; go 1.21
 google.golang.org/protobuf/encoding/prototext
 google.golang.org/protobuf/encoding/protowire
 google.golang.org/protobuf/internal/descfmt

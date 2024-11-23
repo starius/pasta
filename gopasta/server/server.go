@@ -260,7 +260,20 @@ func (h *Handler) handleRecord(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	record, err := h.db.Lookup(id, r.UserAgent())
+
+	// In case of file download, DuckDuckGO sends two requests: first
+	// request is a probe, sent by WebView component of DuckDuckGO. Its
+	// result is not saved. Then another request is sent by the browser
+	// itself and its result is saved. To prevent a self-burning file from
+	// expiring after the first request, we detect the first request by
+	// header X-Requested-With and keep the file, returning zero bytes in
+	// response. The length of response is preserved though. For additional
+	// context see https://github.com/duckduckgo/Android/issues/5164
+	// Similar problem exists in Telegram embedded browser.
+	xrw := r.Header.Get("X-Requested-With")
+	probe := strings.Contains(xrw, "duckduckgo") || strings.Contains(xrw, "telegram")
+
+	record, err := h.db.Lookup(id, r.UserAgent(), probe)
 	if err != nil {
 		log.Printf("db.Lookup(%d): %v.", id, err)
 		http.Error(w, "bad link", http.StatusBadRequest)

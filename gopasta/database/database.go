@@ -9,7 +9,7 @@ import (
 	"sync"
 
 	"github.com/golang/snappy"
-	agents "github.com/monperrus/crawler-user-agents"
+	"github.com/starius/pasta/gopasta/blockedbots"
 	"gitlab.com/starius/deallocate"
 	"google.golang.org/protobuf/proto"
 )
@@ -130,7 +130,7 @@ func (d *Database) Lookup(key uint64, userAgent string, probeRequest bool) (rec 
 		return nil, err
 	}
 	if record.SelfBurning {
-		if agents.IsCrawler(userAgent) {
+		if blockedbots.IsBlockedCrawler(userAgent) {
 			return nil, fmt.Errorf("preventing link burning by a crawler")
 		}
 		if probeRequest {

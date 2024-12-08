@@ -2,7 +2,7 @@
 
 set -ue
 
-server="https://pasta.cf"
+server="https://pastacity.nl"
 
 # Usage:
 # $ pasta.sh file [options]

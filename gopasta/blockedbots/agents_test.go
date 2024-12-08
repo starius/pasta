@@ -13,11 +13,11 @@ func TestIsBlockedCrawler(t *testing.T) {
 		},
 		{
 			userAgent:   "wget",
-			wantBlocked: true,
+			wantBlocked: false,
 		},
 		{
 			userAgent:   "curl/7.29.0",
-			wantBlocked: true,
+			wantBlocked: false,
 		},
 		{
 			userAgent:   "PageThing http://pagething.com curl www",

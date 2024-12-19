@@ -6,7 +6,7 @@ toolchain go1.23.2
 
 require (
 	github.com/golang/snappy v0.0.4
-	github.com/monperrus/crawler-user-agents v0.0.0-20241021052531-8cce9afae9c7
+	github.com/monperrus/crawler-user-agents v0.0.0-20241216185936-88f6ac3eecbf
 	github.com/robfig/humanize v0.0.0-20130801072920-4123e5c9f2f9
 	github.com/tyler-smith/go-bip39 v1.1.0
 	gitlab.com/NebulousLabs/entropy-mnemonics v0.0.0-20181018051301-7532f67e3500
@@ -17,7 +17,7 @@ require (
 	golang.org/x/crypto v0.31.0
 	golang.org/x/net v0.33.0
 	golang.org/x/term v0.27.0
-	google.golang.org/protobuf v1.35.1
+	google.golang.org/protobuf v1.36.0
 )
 
 require (

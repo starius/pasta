@@ -15,7 +15,7 @@ require (
 	gitlab.com/starius/encrypt-autocert-cache v0.1.2
 	gitlab.com/starius/fpe v0.0.0-20181110234326-b113c8214a5f
 	golang.org/x/crypto v0.31.0
-	golang.org/x/net v0.30.0
+	golang.org/x/net v0.33.0
 	golang.org/x/term v0.27.0
 	google.golang.org/protobuf v1.35.1
 )

@@ -41,9 +41,11 @@ type Handler struct {
 	domains    []string
 	allowFiles bool
 	filesBurn  bool
+
+	filesScheme, filesHost string
 }
 
-func NewHandler(db *database.Database, idEncoder IDEncoder, maxSize int, adminAuth string, domains []string, allowFiles, filesBurn bool) *Handler {
+func NewHandler(db *database.Database, idEncoder IDEncoder, maxSize int, adminAuth string, domains []string, allowFiles, filesBurn bool, filesScheme, filesHost string) *Handler {
 	faviconReader := bytes.NewReader(pasta.FaviconBytes)
 	faviconHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "image/vnd.microsoft.icon")
@@ -51,16 +53,18 @@ func NewHandler(db *database.Database, idEncoder IDEncoder, maxSize int, adminAu
 	}
 
 	h := &Handler{
-		db:         db,
-		idEncoder:  idEncoder,
-		mux:        http.NewServeMux(),
-		mainTmpl:   template.Must(template.ParseFS(templatesFs, "index.html", "base.html")),
-		uploadTmpl: template.Must(template.ParseFS(templatesFs, "upload.html", "base.html")),
-		maxSize:    int64(maxSize),
-		adminAuth:  adminAuth,
-		domains:    domains,
-		allowFiles: allowFiles,
-		filesBurn:  filesBurn,
+		db:          db,
+		idEncoder:   idEncoder,
+		mux:         http.NewServeMux(),
+		mainTmpl:    template.Must(template.ParseFS(templatesFs, "index.html", "base.html")),
+		uploadTmpl:  template.Must(template.ParseFS(templatesFs, "upload.html", "base.html")),
+		maxSize:     int64(maxSize),
+		adminAuth:   adminAuth,
+		domains:     domains,
+		allowFiles:  allowFiles,
+		filesBurn:   filesBurn,
+		filesScheme: filesScheme,
+		filesHost:   filesHost,
 	}
 
 	h.mux.HandleFunc("/favicon.ico", faviconHandler)
@@ -75,6 +79,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 var punycode = idna.New()
+
+const textContentType = "text/plain; charset=utf-8"
 
 func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -160,8 +166,9 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 		selfBurning = true
 	}
 	if h.filesBurn && !selfBurning {
-		ctype = "text/plain; charset=utf-8"
+		ctype = textContentType
 	}
+	isFile := !redirect && ctype != textContentType
 
 	record := &database.Record{
 		Content:     content,
@@ -192,6 +199,10 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("punycode.ToUnicode(%q): %v.", r.Host, err)
 		host = r.Host
+	}
+	if h.filesHost != "" && isFile {
+		scheme = h.filesScheme
+		host = h.filesHost
 	}
 	targetURL := fmt.Sprintf("%s://%s/%s", scheme, host, phrase)
 	if !selfBurning && !redirect && contentTypeIsInline(ctype) {
@@ -291,6 +302,13 @@ func (h *Handler) handleRecord(w http.ResponseWriter, r *http.Request) {
 		}
 		http.Redirect(w, r, string(record.Content), status)
 	} else {
+		isFile := record.ContentType != textContentType
+		if isFile && h.filesHost != "" && r.Host != h.filesHost {
+			log.Printf("bad host for downloads (%q != %q)", r.Host, h.filesHost)
+			http.Error(w, "bad link", http.StatusBadRequest)
+			return
+		}
+
 		if record.Filename != "" {
 			w.Header().Add("Content-Disposition", fmt.Sprintf("inline; filename=%q", record.Filename))
 		}

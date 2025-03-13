@@ -1,7 +1,6 @@
 module github.com/starius/pasta
 
 go 1.21
-
 toolchain go1.23.2
 
 require (
@@ -14,13 +13,13 @@ require (
 	gitlab.com/starius/deallocate v0.0.0-20190713141632-605b24537969
 	gitlab.com/starius/encrypt-autocert-cache v0.1.2
 	gitlab.com/starius/fpe v0.0.0-20181110234326-b113c8214a5f
-	golang.org/x/crypto v0.31.0
-	golang.org/x/net v0.33.0
-	golang.org/x/term v0.27.0
+	golang.org/x/crypto v0.35.0
+	golang.org/x/net v0.36.0
+	golang.org/x/term v0.29.0
 	google.golang.org/protobuf v1.36.0
 )
 
 require (
-	golang.org/x/sys v0.28.0 // indirect
-	golang.org/x/text v0.21.0 // indirect
+	golang.org/x/sys v0.30.0 // indirect
+	golang.org/x/text v0.22.0 // indirect
 )

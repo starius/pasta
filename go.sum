@@ -1,3 +1,5 @@
+github.com/alexvec/go-bip39 v1.1.0 h1:NIIGUK5upunOmun1ud6wuLmgGOlyNJisOvaM+zPoWic=
+github.com/alexvec/go-bip39 v1.1.0/go.mod h1:krOrXeBrNpaizxUULtpLeQ64bm/+0vPMHk11kXwb9lY=
 github.com/golang/snappy v1.0.0 h1:Oy607GVXHs7RtbggtPBnr2RmDArIsAefDwvrdWvRhGs=
 github.com/golang/snappy v1.0.0/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
 github.com/google/go-cmp v0.5.5 h1:Khx7svrCpmxxtHBq5j2mp/xVjsi8hQMfNLvJFAlrGgU=
@@ -6,8 +8,6 @@ github.com/monperrus/crawler-user-agents v0.0.0-20250328062230-dc80ba8f43cf h1:x
 github.com/monperrus/crawler-user-agents v0.0.0-20250328062230-dc80ba8f43cf/go.mod h1:GfRyKbsbxSrRxTPYnVi4U/0stQd6BcFCxDy6i6IxQ0M=
 github.com/robfig/humanize v0.0.0-20130801072920-4123e5c9f2f9 h1:ox2YYDFeBLtX+ppK/wsDCdIjxiyrb9N+nZUzutCwSkc=
 github.com/robfig/humanize v0.0.0-20130801072920-4123e5c9f2f9/go.mod h1:22cALbnMi4X46KeLCD6AD0kHX9bX4MBXvKEEOvrNiKc=
-github.com/tyler-smith/go-bip39 v1.1.0 h1:5eUemwrMargf3BSLRRCalXT93Ns6pQJIjYQN2nyfOP8=
-github.com/tyler-smith/go-bip39 v1.1.0/go.mod h1:gUYDtqQw1JS3ZJ8UWVcGTGqqr6YIN3CWg+kkNaLt55U=
 gitlab.com/NebulousLabs/entropy-mnemonics v0.0.0-20181018051301-7532f67e3500 h1:BUDZfLl/9IRseYl7/GW1DF+11SYCMJ6P4whCBJhtEhQ=
 gitlab.com/NebulousLabs/entropy-mnemonics v0.0.0-20181018051301-7532f67e3500/go.mod h1:4koft3fRXTETovKPTeX/Aggj+ajCGWCcuuBBc598Pcs=
 gitlab.com/NebulousLabs/fastrand v0.0.0-20181126182046-603482d69e40 h1:dizWJqTWjwyD8KGcMOwgrkqu1JIkofYgKkmDeNE7oAs=

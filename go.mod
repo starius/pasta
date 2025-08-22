@@ -24,3 +24,6 @@ require (
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 )
+
+// tyler-smith's repo was removed. Use a fork.
+replace github.com/tyler-smith/go-bip39 => github.com/alexvec/go-bip39 v1.1.0

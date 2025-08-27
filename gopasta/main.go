@@ -38,6 +38,7 @@ var (
 	printAdmin   = flag.Bool("print-admin-auth", false, "Print admin Authorization header and exit")
 	allowFiles   = flag.Bool("allow-files", true, "Allow binary files, not only texts")
 	filesBurn    = flag.Bool("files-burn", false, "Binary files are forced to be self-burning")
+	allBurn      = flag.Bool("all-burn", false, "All records are forced to be self-burning")
 	filesScheme  = flag.String("files-scheme", "", "If set, downloading of files is available only using this URL scheme")
 	filesHost    = flag.String("files-host", "", "If set, downloading of files is available only using this hostname")
 	maxSize      = flag.Int("max-size", 10*1024*1024, "Max record size, bytes")
@@ -165,7 +166,7 @@ func main() {
 	if len(domainsList[0]) == 0 {
 		domainsList = nil
 	}
-	handler := server.NewHandler(db, idEncoder, *maxSize, adminAuth, domainsList, *allowFiles, *filesBurn, *filesScheme, *filesHost)
+	handler := server.NewHandler(db, idEncoder, *maxSize, adminAuth, domainsList, *allowFiles, *filesBurn, *allBurn, *filesScheme, *filesHost)
 
 	if *letsDomains != "" {
 		// Use Let's Encrypt.

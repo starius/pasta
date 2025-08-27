@@ -41,11 +41,12 @@ type Handler struct {
 	domains    []string
 	allowFiles bool
 	filesBurn  bool
+	allBurn    bool
 
 	filesScheme, filesHost string
 }
 
-func NewHandler(db *database.Database, idEncoder IDEncoder, maxSize int, adminAuth string, domains []string, allowFiles, filesBurn bool, filesScheme, filesHost string) *Handler {
+func NewHandler(db *database.Database, idEncoder IDEncoder, maxSize int, adminAuth string, domains []string, allowFiles, filesBurn, allBurn bool, filesScheme, filesHost string) *Handler {
 	faviconReader := bytes.NewReader(pasta.FaviconBytes)
 	faviconHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "image/vnd.microsoft.icon")
@@ -63,6 +64,7 @@ func NewHandler(db *database.Database, idEncoder IDEncoder, maxSize int, adminAu
 		domains:     domains,
 		allowFiles:  allowFiles,
 		filesBurn:   filesBurn,
+		allBurn:     allBurn,
 		filesScheme: filesScheme,
 		filesHost:   filesHost,
 	}
@@ -163,6 +165,9 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	if h.filesBurn && !validText {
 		// In filesBurn mode all files are forced self-burning.
+		selfBurning = true
+	}
+	if h.allBurn {
 		selfBurning = true
 	}
 	if h.filesBurn && !selfBurning {
@@ -339,7 +344,7 @@ func (h *Handler) handleMain(w http.ResponseWriter, r *http.Request) {
 		Uploads:     humanize.Comma(h.db.RecordsCount()),
 		Domains:     h.domains,
 	}
-	vars.ForcedBurn = h.filesBurn && vars.FileTab
+	vars.ForcedBurn = h.filesBurn && vars.FileTab || h.allBurn
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := h.mainTmpl.Execute(w, vars); err != nil {
 		log.Printf("failed to execute template: %v", err)

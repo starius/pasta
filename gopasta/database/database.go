@@ -31,9 +31,10 @@ type Database struct {
 	mu                sync.Mutex
 	maxSize           uint64
 	lru               *LRU
+	allBurn           bool
 }
 
-func NewDatabase(index, data *os.File, indexBlock, dataBlock cipher.Block, maxSize, cacheRecords, cacheBytes int) (*Database, error) {
+func NewDatabase(index, data *os.File, indexBlock, dataBlock cipher.Block, maxSize, cacheRecords, cacheBytes int, allBurn bool) (*Database, error) {
 	indexStat, err := index.Stat()
 	if err != nil {
 		return nil, err
@@ -52,6 +53,7 @@ func NewDatabase(index, data *os.File, indexBlock, dataBlock cipher.Block, maxSi
 		indexLen: uint64(indexStat.Size()),
 		dataLen:  uint64(dataStat.Size()),
 		maxSize:  uint64(maxSize),
+		allBurn:  allBurn,
 	}
 	if cacheRecords != 0 && cacheBytes != 0 {
 		lru, err := NewLRU(uint64(cacheRecords), uint64(cacheBytes))
@@ -129,7 +131,7 @@ func (d *Database) Lookup(key uint64, userAgent string, probeRequest bool) (rec 
 	if err := proto.Unmarshal(dataBuffer, &record); err != nil {
 		return nil, err
 	}
-	if record.SelfBurning {
+	if record.SelfBurning || d.allBurn {
 		if blockedbots.IsBlockedCrawler(userAgent) {
 			return nil, fmt.Errorf("preventing link burning by a crawler")
 		}
@@ -184,7 +186,7 @@ func (d *Database) Add(record *Record) (uint64, error) {
 	key := indexLen / 8
 	dataLen := d.dataLen
 	d.dataLen += uint64(len(data))
-	if !record.SelfBurning && d.lru != nil {
+	if !(record.SelfBurning || d.allBurn) && d.lru != nil {
 		d.lru.Set(key, record, recordSize(record))
 	}
 	d.mu.Unlock()

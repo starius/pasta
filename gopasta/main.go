@@ -135,7 +135,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	db, err := database.NewDatabase(index, data, indexBlock, dataBlock, *maxSize, *cacheRecords, *cacheBytes)
+	db, err := database.NewDatabase(index, data, indexBlock, dataBlock, *maxSize, *cacheRecords, *cacheBytes, *allBurn)
 	if err != nil {
 		panic(err)
 	}

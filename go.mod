@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/golang/snappy v1.0.0
-	github.com/monperrus/crawler-user-agents v1.18.0
+	github.com/monperrus/crawler-user-agents v1.22.0
 	github.com/robfig/humanize v0.0.0-20130801072920-4123e5c9f2f9
 	github.com/tyler-smith/go-bip39 v1.1.0
 	gitlab.com/NebulousLabs/entropy-mnemonics v0.0.0-20181018051301-7532f67e3500
@@ -15,7 +15,7 @@ require (
 	golang.org/x/crypto v0.45.0
 	golang.org/x/net v0.47.0
 	golang.org/x/term v0.37.0
-	google.golang.org/protobuf v1.36.8
+	google.golang.org/protobuf v1.36.10
 )
 
 require (

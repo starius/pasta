@@ -1,7 +1,7 @@
 # github.com/golang/snappy v1.0.0
 ## explicit
 github.com/golang/snappy
-# github.com/monperrus/crawler-user-agents v1.18.0
+# github.com/monperrus/crawler-user-agents v1.22.0
 ## explicit; go 1.19
 github.com/monperrus/crawler-user-agents
 # github.com/robfig/humanize v0.0.0-20130801072920-4123e5c9f2f9
@@ -50,7 +50,7 @@ golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
-# google.golang.org/protobuf v1.36.8
+# google.golang.org/protobuf v1.36.10
 ## explicit; go 1.23
 google.golang.org/protobuf/encoding/prototext
 google.golang.org/protobuf/encoding/protowire

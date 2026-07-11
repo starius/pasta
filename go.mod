@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/golang/snappy v1.0.0
-	github.com/monperrus/crawler-user-agents v1.37.0
+	github.com/monperrus/crawler-user-agents v1.56.0
 	github.com/robfig/humanize v0.0.0-20130801072920-4123e5c9f2f9
 	github.com/tyler-smith/go-bip39 v1.1.0
 	gitlab.com/NebulousLabs/entropy-mnemonics v0.0.0-20181018051301-7532f67e3500
@@ -12,15 +12,15 @@ require (
 	gitlab.com/starius/deallocate v0.0.0-20190713141632-605b24537969
 	gitlab.com/starius/encrypt-autocert-cache v0.1.2
 	gitlab.com/starius/fpe v0.0.0-20181110234326-b113c8214a5f
-	golang.org/x/crypto v0.49.0
-	golang.org/x/net v0.52.0
-	golang.org/x/term v0.41.0
+	golang.org/x/crypto v0.54.0
+	golang.org/x/net v0.57.0
+	golang.org/x/term v0.45.0
 	google.golang.org/protobuf v1.36.11
 )
 
 require (
-	golang.org/x/sys v0.42.0 // indirect
-	golang.org/x/text v0.35.0 // indirect
+	golang.org/x/sys v0.47.0 // indirect
+	golang.org/x/text v0.40.0 // indirect
 )
 
 // tyler-smith's repo was removed. Use a fork.

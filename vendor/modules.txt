@@ -1,7 +1,7 @@
 # github.com/golang/snappy v1.0.0
 ## explicit
 github.com/golang/snappy
-# github.com/monperrus/crawler-user-agents v1.37.0
+# github.com/monperrus/crawler-user-agents v1.56.0
 ## explicit; go 1.19
 github.com/monperrus/crawler-user-agents
 # github.com/robfig/humanize v0.0.0-20130801072920-4123e5c9f2f9
@@ -26,25 +26,25 @@ gitlab.com/starius/encrypt-autocert-cache
 ## explicit
 gitlab.com/starius/fpe
 gitlab.com/starius/fpe/phrase
-# golang.org/x/crypto v0.49.0
+# golang.org/x/crypto v0.54.0
 ## explicit; go 1.25.0
 golang.org/x/crypto/acme
 golang.org/x/crypto/acme/autocert
 golang.org/x/crypto/blake2b
 golang.org/x/crypto/hkdf
-# golang.org/x/net v0.52.0
+# golang.org/x/net v0.57.0
 ## explicit; go 1.25.0
 golang.org/x/net/idna
-# golang.org/x/sys v0.42.0
+# golang.org/x/sys v0.47.0
 ## explicit; go 1.25.0
 golang.org/x/sys/cpu
 golang.org/x/sys/plan9
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/term v0.41.0
+# golang.org/x/term v0.45.0
 ## explicit; go 1.25.0
 golang.org/x/term
-# golang.org/x/text v0.35.0
+# golang.org/x/text v0.40.0
 ## explicit; go 1.25.0
 golang.org/x/text/secure/bidirule
 golang.org/x/text/transform

@@ -262,15 +262,18 @@ func (h *Handler) handleRecord(w http.ResponseWriter, r *http.Request) {
 	phrase := pathParts[len(pathParts)-1]
 	if phrase == "" {
 		if len(pathParts) == 1 {
-			log.Printf("Bad URL: %s.", r.URL.Path)
 			http.Error(w, "bad link", http.StatusBadRequest)
 			return
 		}
 		phrase = pathParts[len(pathParts)-2]
 	}
+	if len(phrase) > 256 {
+		http.Error(w, "bad link", http.StatusBadRequest)
+		return
+	}
 	id, longID, err := h.idEncoder.Decode(phrase)
 	if err != nil {
-		log.Printf("idEncoder.Decode(%q): %v.", phrase, err)
+		log.Printf("invalid record ID")
 		http.Error(w, "bad link", http.StatusBadRequest)
 		return
 	}
@@ -292,22 +295,29 @@ func (h *Handler) handleRecord(w http.ResponseWriter, r *http.Request) {
 	// context see https://github.com/duckduckgo/Android/issues/5164
 	// Similar problem exists in Telegram embedded browser.
 	xrw := r.Header.Get("X-Requested-With")
-	probe := strings.Contains(xrw, "duckduckgo") || strings.Contains(xrw, "telegram")
+	probe := r.Method == http.MethodHead || strings.Contains(xrw, "duckduckgo") || strings.Contains(xrw, "telegram")
 
-	record, err := h.db.Lookup(id, r.UserAgent(), probe)
+	record, err := h.db.LookupValidated(id, r.UserAgent(), probe, func(record *database.Record) error {
+		if record.LongId != longID {
+			return fmt.Errorf("record ID type mismatch")
+		}
+		if record.Redirect {
+			if !validRedirectURL(string(record.Content)) {
+				return fmt.Errorf("invalid redirect URL")
+			}
+		} else if record.ContentType != textContentType && h.filesHost != "" && r.Host != h.filesHost {
+			return fmt.Errorf("incorrect file download host")
+		}
+		return nil
+	})
 	if err != nil {
 		log.Printf("db.Lookup(%d): %v.", id, err)
 		http.Error(w, "bad link", http.StatusBadRequest)
 		return
 	}
-	if record.LongId != longID {
-		log.Printf("long ID mismatch in %d.", id)
-		http.Error(w, "bad link", http.StatusBadRequest)
-		return
-	}
 	if record.Redirect {
-		if !validRedirectURL(string(record.Content)) {
-			http.Error(w, "bad link", http.StatusBadRequest)
+		if probe {
+			w.WriteHeader(http.StatusNoContent)
 			return
 		}
 		status := http.StatusMovedPermanently
@@ -316,13 +326,6 @@ func (h *Handler) handleRecord(w http.ResponseWriter, r *http.Request) {
 		}
 		http.Redirect(w, r, string(record.Content), status)
 	} else {
-		isFile := record.ContentType != textContentType
-		if isFile && h.filesHost != "" && r.Host != h.filesHost {
-			log.Printf("bad host for downloads (%q != %q)", r.Host, h.filesHost)
-			http.Error(w, "bad link", http.StatusBadRequest)
-			return
-		}
-
 		// User uploads must never gain the site's origin or execute active content.
 		w.Header().Set("Content-Security-Policy", "sandbox; default-src 'none'; base-uri 'none'; form-action 'none'")
 		disposition := "attachment"

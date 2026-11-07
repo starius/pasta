@@ -145,6 +145,66 @@ func TestUnsafeRedirectsRejected(t *testing.T) {
 	}
 }
 
+func TestRejectedRequestsDoNotBurnRecords(t *testing.T) {
+	for _, rejected := range []string{"id-type", "file-host"} {
+		t.Run(rejected, func(t *testing.T) {
+			h := testHandler(t)
+			target := addRecord(t, h, &database.Record{Content: []byte("secret"), LongId: true, SelfBurning: true, ContentType: "application/octet-stream"})
+			badTarget := target
+			if rejected == "id-type" {
+				badTarget = strings.Replace(target, "long-", "short-", 1)
+			} else {
+				h.filesHost = "example.test"
+				badTarget = strings.Replace(target, "example.test", "wrong.test", 1)
+			}
+			if w := request(h, http.MethodGet, badTarget); w.Code != http.StatusBadRequest {
+				t.Fatalf("rejected request status: %d", w.Code)
+			}
+			if w := request(h, http.MethodGet, target); w.Code != http.StatusOK || w.Body.String() != "secret" {
+				t.Fatalf("valid request lost record: %d %q", w.Code, w.Body.String())
+			}
+			if w := request(h, http.MethodGet, target); w.Code == http.StatusOK {
+				t.Fatal("record was readable twice")
+			}
+		})
+	}
+}
+
+func TestHeadAndProbePreserveOneTimeRedirect(t *testing.T) {
+	for _, method := range []string{http.MethodHead, http.MethodGet} {
+		t.Run(method, func(t *testing.T) {
+			h := testHandler(t)
+			const secret = "https://example.org/secret-token"
+			target := addRecord(t, h, &database.Record{Content: []byte(secret), Redirect: true, SelfBurning: true})
+			r := httptest.NewRequest(method, target, nil)
+			if method == http.MethodGet {
+				r.Header.Set("X-Requested-With", "telegram")
+			}
+			w := httptest.NewRecorder()
+			h.ServeHTTP(w, r)
+			if w.Code != http.StatusNoContent || w.Header().Get("Location") != "" || w.Body.Len() != 0 {
+				t.Fatalf("probe leaked redirect: %d %v %q", w.Code, w.Header(), w.Body.String())
+			}
+			w = request(h, http.MethodGet, target)
+			if w.Code != http.StatusFound || w.Header().Get("Location") != secret {
+				t.Fatalf("probe burned redirect: %d %v", w.Code, w.Header())
+			}
+		})
+	}
+}
+
+func TestHeadPreservesOneTimeText(t *testing.T) {
+	h := testHandler(t)
+	target := addRecord(t, h, &database.Record{Content: []byte("secret"), ContentType: textContentType, SelfBurning: true})
+	w := request(h, http.MethodHead, target)
+	if w.Code != http.StatusOK || w.Body.Len() != 0 || w.Header().Get("Content-Length") != "6" {
+		t.Fatalf("invalid HEAD response: %d %v %q", w.Code, w.Header(), w.Body.String())
+	}
+	if w := request(h, http.MethodGet, target); w.Code != http.StatusOK || w.Body.String() != "secret" {
+		t.Fatalf("HEAD burned record: %d %q", w.Code, w.Body.String())
+	}
+}
+
 func TestUploadRejectsUnsafeFilenamesAndQueryContent(t *testing.T) {
 	h := testHandler(t)
 	for _, filename := range []string{strings.Repeat("x", 256), "file\r\nInjected: header", "file\x00.txt"} {

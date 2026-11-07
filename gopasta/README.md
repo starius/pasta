@@ -10,7 +10,7 @@ Below are instructions on how to run your own instance.
 
 Install Go: https://go.dev/doc/install
 
-You need at least version 1.19.
+You need at least Go 1.27.3. Use the latest stable patch release for security fixes.
 
 To download the code and build the binary, use the following command:
 ```

@@ -18363,5 +18363,90 @@
     "tags": [
       "search-engine"
     ]
+  },
+  {
+    "pattern": "WatchForBot",
+    "addition_date": "2026/07/24",
+    "url": "https://watchfor.io/bot",
+    "instances": [
+      "Mozilla/5.0 (compatible; WatchForBot/1.0; +https://watchfor.io/bot)"
+    ],
+    "description": "WatchFor uptime monitoring agent — scheduled availability, SSL, DNS and performance checks of customer-configured endpoints",
+    "tags": [
+      "monitoring"
+    ]
+  },
+  {
+    "pattern": "ListGemBot",
+    "addition_date": "2026/08/06",
+    "url": "https://listgem.com/bot",
+    "instances": [
+      "ListGemBot/1.0 (+https://listgem.com/bot)"
+    ],
+    "description": "ListGemBot is the link unfurler for ListGem, a structured curation platform. When a user adds a URL to one of their lists, it fetches that single page to read its public metadata for the preview.",
+    "tags": [
+      "social-preview"
+    ]
+  },
+  {
+    "pattern": "IsonSearchBot",
+    "addition_date": "2026/09/29",
+    "url": "https://search.isonai.com/bot",
+    "instances": [
+      "IsonSearchBot/1.0 (+https://search.isonai.com/bot)",
+      "IsonSearchBot/2.0 (+https://search.isonai.com/bot)"
+    ],
+    "description": "IsonSearchBot is the web crawler of Ison Search, a search engine run from Indonesia. It indexes public pages for search results and cited answers that link back to the source; content is not used to train AI models.",
+    "tags": [
+      "search-engine"
+    ]
+  },
+  {
+    "pattern": "9bot\\/",
+    "addition_date": "2026/10/19",
+    "url": "https://9bot.com.br/en/9bot-docs/",
+    "instances": [
+      "9bot/1.0 (+https://9bot.com.br/en/9bot-docs)"
+    ],
+    "description": "9bot is the link-preview fetcher of 9bot.com.br, a WhatsApp group management service. It fetches a single public page only when its URL is shared in a 9bot-managed WhatsApp group, to build the link preview.",
+    "tags": [
+      "social-preview"
+    ]
+  },
+  {
+    "pattern": "IsonAI-User",
+    "addition_date": "2026/10/22",
+    "url": "https://docs.isonai.com/en/bots/",
+    "instances": [
+      "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; IsonAI-User/1.0; +https://www.isonai.com/bot"
+    ],
+    "description": "IsonAI-User fetches a web page when a person using the IsonAI assistant asks about it. It does not crawl automatically and is not used to build a search index.",
+    "tags": [
+      "ai-crawler"
+    ]
+  },
+  {
+    "pattern": "InfoSifter",
+    "addition_date": "2026/09/22",
+    "url": "https://logicus.se/about_InfoSifter.html",
+    "instances": [
+      "InfoSifter/1.0 (+https://logicus.se/about_InfoSifter.html)"
+    ],
+    "description": "InfoSifter verifies the public web presence of Swedish companies (official website, published contact details) for a company database operated on behalf of its client. It fetches only the homepage and contact pages as HTML, respects robots.txt per RFC 9309, and always identifies itself with a contact URL.",
+    "tags": [
+      "monitoring"
+    ]
+  },
+  {
+    "pattern": "AIWebIndex",
+    "url": "https://www.lyrenth.com/bot",
+    "instances": [
+      "AIWebIndex/2.0 (+https://lyrenth.com/bot; AI-readable web index)"
+    ],
+    "addition_date": "2026/10/30",
+    "description": " Lyrenth AIWebIndex crawler",
+    "tags": [
+      "ai-crawler"
+    ]
   }
 ]

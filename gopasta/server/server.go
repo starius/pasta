@@ -47,10 +47,9 @@ type Handler struct {
 }
 
 func NewHandler(db *database.Database, idEncoder IDEncoder, maxSize int, adminAuth string, domains []string, allowFiles, filesBurn, allBurn bool, filesScheme, filesHost string) *Handler {
-	faviconReader := bytes.NewReader(pasta.FaviconBytes)
 	faviconHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "image/vnd.microsoft.icon")
-		http.ServeContent(w, r, "favicon.ico", time.Unix(0, 0), faviconReader)
+		http.ServeContent(w, r, "favicon.ico", time.Unix(0, 0), bytes.NewReader(pasta.FaviconBytes))
 	}
 
 	h := &Handler{

@@ -11,9 +11,11 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/starius/pasta/gopasta/database"
+	"github.com/starius/pasta/src/static/pasta"
 )
 
 type testIDEncoder struct{}
@@ -217,4 +219,20 @@ func TestUploadRejectsUnsafeFilenamesAndQueryContent(t *testing.T) {
 	if w.Code != http.StatusBadRequest || h.db.RecordsCount() != 0 {
 		t.Fatalf("query content accepted: %d", w.Code)
 	}
+}
+
+func TestConcurrentFaviconRequests(t *testing.T) {
+	h := testHandler(t)
+	var wg sync.WaitGroup
+	for range 20 {
+		wg.Go(func() {
+			for range 10 {
+				w := request(h, http.MethodGet, "http://example.test/favicon.ico")
+				if w.Code != http.StatusOK || !bytes.Equal(w.Body.Bytes(), pasta.FaviconBytes) {
+					t.Error("concurrent favicon response corrupted")
+				}
+			}
+		})
+	}
+	wg.Wait()
 }

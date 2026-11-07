@@ -1,31 +1,18 @@
 package server
 
-import "strings"
+import "mime"
 
+// Only passive media and plain text are safe to display as uploaded content.
 func contentTypeIsInline(ctype string) bool {
-	if strings.HasPrefix(ctype, "text/") {
-		return true
+	mediaType, _, err := mime.ParseMediaType(ctype)
+	if err != nil {
+		return false
 	}
-	if strings.HasPrefix(ctype, "image/png") {
+	switch mediaType {
+	case "text/plain", "image/png", "image/jpeg", "image/gif", "image/webp",
+		"audio/mpeg", "audio/ogg", "application/json":
 		return true
+	default:
+		return false
 	}
-	if strings.HasPrefix(ctype, "image/jpeg") {
-		return true
-	}
-	if strings.HasPrefix(ctype, "image/gif") {
-		return true
-	}
-	if strings.HasPrefix(ctype, "audio/mpeg") {
-		return true
-	}
-	if strings.HasPrefix(ctype, "audio/ogg") {
-		return true
-	}
-	if strings.HasPrefix(ctype, "application/json") {
-		return true
-	}
-	if strings.HasPrefix(ctype, "application/javascript") {
-		return true
-	}
-	return false
 }

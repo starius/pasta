@@ -77,6 +77,9 @@ func NewHandler(db *database.Database, idEncoder IDEncoder, maxSize int, adminAu
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "no-store")
+	w.Header().Set("Referrer-Policy", "no-referrer")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
 	h.mux.ServeHTTP(w, r)
 }
 
@@ -98,13 +101,16 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	content := []byte(r.FormValue("content"))
-	filename := r.FormValue("filename")
-	selfBurning := r.FormValue("self_burning") != ""
-	redirect := r.FormValue("redirect") != ""
-	longID := r.FormValue("long_id") != ""
+	defer r.MultipartForm.RemoveAll()
+
+	content := []byte(r.PostFormValue("content"))
+	filename := r.PostFormValue("filename")
+	selfBurning := r.PostFormValue("self_burning") != ""
+	redirect := r.PostFormValue("redirect") != ""
+	longID := r.PostFormValue("long_id") != ""
 
 	if file, header, err := r.FormFile("file"); err == nil {
+		defer file.Close()
 		if len(content) != 0 || filename != "" {
 			log.Printf("Provided both text content and file")
 			http.Error(w, "Provided both text content and file", http.StatusBadRequest)
@@ -119,22 +125,21 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 		filename = header.Filename
 	}
 
+	if len(filename) > 255 || strings.IndexFunc(filename, func(r rune) bool { return r < 0x20 || r == 0x7f }) >= 0 {
+		http.Error(w, "invalid filename", http.StatusBadRequest)
+		return
+	}
+	if int64(len(content)) > h.maxSize {
+		http.Error(w, "content is too large", http.StatusRequestEntityTooLarge)
+		return
+	}
 	if redirect {
 		content = bytes.TrimSpace(content)
-		u, err := url.Parse(string(content))
-		if err != nil {
-			log.Printf("URL is invalid: %v.", err)
-			http.Error(w, "URL is invalid", http.StatusBadRequest)
+		if !validRedirectURL(string(content)) {
+			http.Error(w, "URL must use http or https with a host", http.StatusBadRequest)
 			return
 		}
-		if !u.IsAbs() {
-			log.Printf("URL is not absolute.")
-			http.Error(w, "URL is not absolute", http.StatusBadRequest)
-			return
-		}
-		content = []byte(u.String())
 		if len(content) > 1024 {
-			log.Printf("URL is too long.")
 			http.Error(w, "URL is too long", http.StatusBadRequest)
 			return
 		}
@@ -214,7 +219,7 @@ func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, targetURL, http.StatusFound)
 	}
 
-	if r.FormValue("browser") != "on" {
+	if r.PostFormValue("browser") != "on" {
 		fmt.Fprintf(w, "Your link: %s\n", targetURL)
 		return
 	}
@@ -301,6 +306,10 @@ func (h *Handler) handleRecord(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if record.Redirect {
+		if !validRedirectURL(string(record.Content)) {
+			http.Error(w, "bad link", http.StatusBadRequest)
+			return
+		}
 		status := http.StatusMovedPermanently
 		if record.SelfBurning {
 			status = http.StatusFound
@@ -314,12 +323,22 @@ func (h *Handler) handleRecord(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// User uploads must never gain the site's origin or execute active content.
+		w.Header().Set("Content-Security-Policy", "sandbox; default-src 'none'; base-uri 'none'; form-action 'none'")
+		disposition := "attachment"
+		if contentTypeIsInline(record.ContentType) {
+			disposition = "inline"
+		}
+		params := map[string]string{}
 		if record.Filename != "" {
-			w.Header().Add("Content-Disposition", fmt.Sprintf("inline; filename=%q", record.Filename))
+			params["filename"] = record.Filename
 		}
-		if record.ContentType != "" {
-			w.Header().Add("Content-Type", record.ContentType)
+		w.Header().Set("Content-Disposition", mime.FormatMediaType(disposition, params))
+		ctype := record.ContentType
+		if ctype == "" {
+			ctype = "application/octet-stream"
 		}
+		w.Header().Set("Content-Type", ctype)
 		contentReader := bytes.NewReader(record.Content)
 		http.ServeContent(w, r, record.Filename, time.Unix(0, 0), contentReader)
 	}
@@ -349,4 +368,10 @@ func (h *Handler) handleMain(w http.ResponseWriter, r *http.Request) {
 	if err := h.mainTmpl.Execute(w, vars); err != nil {
 		log.Printf("failed to execute template: %v", err)
 	}
+}
+
+// validRedirectURL also checks stored records, which may predate upload validation.
+func validRedirectURL(raw string) bool {
+	u, err := url.Parse(raw)
+	return err == nil && (u.Scheme == "http" || u.Scheme == "https") && u.Hostname() != "" && u.Opaque == ""
 }

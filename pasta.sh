@@ -23,24 +23,23 @@ server="https://pastacity.nl"
 filename=""
 content="<-"
 
-query="/api/create?"
-
-url_shortener="no"
+self_burning=""
+long_id=""
+url_shortener=""
 
 for o in "$@"; do
     case "$o" in
 
         --self-burning)
-            query="${query}self_burning=yes&"
+            self_burning="yes"
         ;;
 
         --long-id)
-            query="${query}long_id=yes&"
+            long_id="yes"
         ;;
 
         --url-shortener)
             url_shortener="yes"
-            query="${query}redirect=yes&"
         ;;
 
         --local)
@@ -48,7 +47,7 @@ for o in "$@"; do
         ;;
 
         *)
-            if [ $url_shortener = "yes" ]; then
+            if [ "$url_shortener" = "yes" ]; then
                 content="$o"
             else
                 filename=$(basename "$o")
@@ -60,6 +59,9 @@ done
 
 curl \
     --silent --show-error \
-    "${server}${query}" \
+    "${server}/api/create" \
     -F "content=$content" \
-    -F "filename=$filename"
+    --form-string "filename=$filename" \
+    --form-string "self_burning=$self_burning" \
+    --form-string "long_id=$long_id" \
+    --form-string "redirect=$url_shortener"

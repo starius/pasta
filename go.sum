@@ -10,8 +10,6 @@ github.com/robfig/humanize v0.0.0-20130801072920-4123e5c9f2f9 h1:ox2YYDFeBLtX+pp
 github.com/robfig/humanize v0.0.0-20130801072920-4123e5c9f2f9/go.mod h1:22cALbnMi4X46KeLCD6AD0kHX9bX4MBXvKEEOvrNiKc=
 gitlab.com/NebulousLabs/entropy-mnemonics v0.0.0-20181018051301-7532f67e3500 h1:BUDZfLl/9IRseYl7/GW1DF+11SYCMJ6P4whCBJhtEhQ=
 gitlab.com/NebulousLabs/entropy-mnemonics v0.0.0-20181018051301-7532f67e3500/go.mod h1:4koft3fRXTETovKPTeX/Aggj+ajCGWCcuuBBc598Pcs=
-gitlab.com/NebulousLabs/fastrand v0.0.0-20181126182046-603482d69e40 h1:dizWJqTWjwyD8KGcMOwgrkqu1JIkofYgKkmDeNE7oAs=
-gitlab.com/NebulousLabs/fastrand v0.0.0-20181126182046-603482d69e40/go.mod h1:rOnSnoRyxMI3fe/7KIbVcsHRGxe30OONv8dEgo+vCfA=
 gitlab.com/starius/deallocate v0.0.0-20190713141632-605b24537969 h1:WaYm2U1fP/g8AnwUyrjGKG2eqdwCRVQmtTQtP+9ohLg=
 gitlab.com/starius/deallocate v0.0.0-20190713141632-605b24537969/go.mod h1:U3X6HNuvctDW2RCdyGFa/dAp+jogkSsMW4WqvSgZl94=
 gitlab.com/starius/encrypt-autocert-cache v0.1.2 h1:AAhszNtgMpdJuD3bxEo+J8kAFz9Sn0n4OVmOcPPbgy8=

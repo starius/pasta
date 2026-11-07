@@ -13,9 +13,6 @@ github.com/tyler-smith/go-bip39/wordlists
 # gitlab.com/NebulousLabs/entropy-mnemonics v0.0.0-20181018051301-7532f67e3500
 ## explicit
 gitlab.com/NebulousLabs/entropy-mnemonics
-# gitlab.com/NebulousLabs/fastrand v0.0.0-20181126182046-603482d69e40
-## explicit
-gitlab.com/NebulousLabs/fastrand
 # gitlab.com/starius/deallocate v0.0.0-20190713141632-605b24537969
 ## explicit
 gitlab.com/starius/deallocate
@@ -30,14 +27,12 @@ gitlab.com/starius/fpe/phrase
 ## explicit; go 1.26.0
 golang.org/x/crypto/acme
 golang.org/x/crypto/acme/autocert
-golang.org/x/crypto/blake2b
 golang.org/x/crypto/hkdf
 # golang.org/x/net v0.62.0
 ## explicit; go 1.26.0
 golang.org/x/net/idna
 # golang.org/x/sys v0.49.0
 ## explicit; go 1.26.0
-golang.org/x/sys/cpu
 golang.org/x/sys/plan9
 golang.org/x/sys/unix
 golang.org/x/sys/windows

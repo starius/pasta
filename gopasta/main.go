@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"crypto/aes"
+	"crypto/rand"
 	"crypto/sha256"
 	"crypto/tls"
 	"encoding/hex"
@@ -15,12 +16,12 @@ import (
 	"os"
 	"strings"
 	"syscall"
+	"unicode/utf8"
 
 	"github.com/starius/pasta/gopasta/database"
 	"github.com/starius/pasta/gopasta/server"
 	"github.com/tyler-smith/go-bip39/wordlists"
 	mnemonics "gitlab.com/NebulousLabs/entropy-mnemonics"
-	"gitlab.com/NebulousLabs/fastrand"
 	"gitlab.com/starius/encrypt-autocert-cache"
 	"gitlab.com/starius/fpe/phrase"
 	"golang.org/x/crypto/acme/autocert"
@@ -60,10 +61,27 @@ func redirectToHTTPS(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, url, http.StatusPermanentRedirect)
 }
 
+func decodeSecret(secret []byte) ([]byte, error) {
+	secret = bytes.TrimSpace(secret)
+	// The mnemonic decoder treats empty words as valid words. Do not silently
+	// normalize them, since that would derive a different key for existing data.
+	if !utf8.Valid(secret) || len(secret) == 0 || string(secret) != strings.Join(strings.Fields(string(secret)), " ") {
+		return nil, fmt.Errorf("invalid secret phrase; use a phrase produced by -gen-secret")
+	}
+	key, err := mnemonics.FromString(string(secret), mnemonics.English)
+	if err != nil || len(key) < 16 {
+		return nil, fmt.Errorf("secret must encode at least 16 bytes; use -gen-secret")
+	}
+	return key, nil
+}
+
 func main() {
 	flag.Parse()
 	if *genSecret {
-		secret := fastrand.Bytes(16)
+		secret := make([]byte, 16)
+		if _, err := rand.Read(secret); err != nil {
+			log.Fatal("Failed to generate secret")
+		}
 		p, err := mnemonics.ToPhrase(secret, mnemonics.English)
 		if err != nil {
 			panic(err)
@@ -89,10 +107,9 @@ func main() {
 			log.Fatalf("Failed to read secret from keyboard")
 		}
 	}
-	secret = bytes.TrimSpace(secret)
-	mainKey, err := mnemonics.FromString(string(secret), mnemonics.English)
+	mainKey, err := decodeSecret(secret)
 	if err != nil {
-		log.Fatalf("Failed to decode the secret")
+		log.Fatalf("Failed to decode the secret: %v", err)
 	}
 	salt, err := hex.DecodeString(saltHex)
 	if err != nil {

@@ -3,6 +3,7 @@ package database
 import (
 	"crypto/cipher"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -26,29 +27,48 @@ type File interface {
 
 type Database struct {
 	index, data       File
+	rawIndex          *os.File
 	rawData           *os.File
 	indexLen, dataLen uint64
 	mu                sync.Mutex
 	maxSize           uint64
 	lru               *LRU
 	allBurn           bool
+	writeErr          error
 }
 
+// Uploaded content is bounded separately from its serialized metadata. Allow
+// room for protobuf fields and MIME types when reading existing records.
+const recordMetadataAllowance = 64 << 10
+
 func NewDatabase(index, data *os.File, indexBlock, dataBlock cipher.Block, maxSize, cacheRecords, cacheBytes int, allBurn bool) (*Database, error) {
+	if maxSize <= 0 || cacheRecords < 0 || cacheBytes < 0 {
+		return nil, fmt.Errorf("invalid database size limits")
+	}
 	indexStat, err := index.Stat()
 	if err != nil {
 		return nil, err
+	}
+	if indexStat.Size()%8 != 0 {
+		return nil, fmt.Errorf("invalid index file length")
 	}
 	dataStat, err := data.Stat()
 	if err != nil {
 		return nil, err
 	}
+	if indexStat.Size() != 0 && dataStat.Size() == 0 {
+		return nil, fmt.Errorf("index entries without data")
+	}
+	// Legacy failed appends can leave unindexed data before the first record.
+	// The first offset is not a key verifier; validate each requested record's
+	// offsets in getOffsets instead of rejecting the entire database here.
 	if err := deallocate.MakeSparse(data); err != nil {
 		return nil, fmt.Errorf("failed to mark file sparse: %v", err)
 	}
 	db := &Database{
 		index:    WrapInCTR(indexBlock, index),
 		data:     WrapInCTR(dataBlock, data),
+		rawIndex: index,
 		rawData:  data,
 		indexLen: uint64(indexStat.Size()),
 		dataLen:  uint64(dataStat.Size()),
@@ -91,6 +111,9 @@ func (d *Database) getOffsets(key, indexLen, dataLen uint64) (dataBegin, dataEnd
 	if dataBegin == 0 && key != 0 {
 		return 0, 0, fmt.Errorf("the record does not exist in the middle")
 	}
+	if dataBegin >= dataEnd || dataEnd > dataLen {
+		return 0, 0, fmt.Errorf("invalid record offsets")
+	}
 	size := dataEnd - dataBegin
 	if size > d.maxSize {
 		return 0, 0, fmt.Errorf("the record seems to be too long")
@@ -103,25 +126,41 @@ func (d *Database) wipeData(dataBegin, dataEnd uint64) error {
 }
 
 func (d *Database) Lookup(key uint64, userAgent string, probeRequest bool) (rec *Record, err error) {
+	return d.LookupValidated(key, userAgent, probeRequest, nil)
+}
+
+// LookupValidated checks request-specific authorization before returning or
+// consuming a record. The validator must not call back into the database.
+func (d *Database) LookupValidated(key uint64, userAgent string, probeRequest bool, validate func(*Record) error) (rec *Record, err error) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
 	if d.lru != nil {
-		d.mu.Lock()
 		r, has := d.lru.Get(key)
-		d.mu.Unlock()
 		if has {
+			if validate != nil {
+				if err := validate(r); err != nil {
+					return nil, err
+				}
+			}
 			return r, nil
 		}
 	}
-	d.mu.Lock()
-	indexLen := d.indexLen
-	dataLen := d.dataLen
-	d.mu.Unlock()
-	dataBegin, dataEnd, err := d.getOffsets(key, indexLen, dataLen)
+	dataBegin, dataEnd, err := d.getOffsets(key, d.indexLen, d.dataLen)
 	if err != nil {
 		return nil, err
 	}
 	dataBuffer := make([]byte, dataEnd-dataBegin)
-	if _, err := d.data.ReadAt(dataBuffer, int64(dataBegin)); err != nil {
+	if n, err := d.data.ReadAt(dataBuffer, int64(dataBegin)); err != nil {
 		return nil, err
+	} else if n != len(dataBuffer) {
+		return nil, io.ErrUnexpectedEOF
+	}
+	decodedLen, err := snappy.DecodedLen(dataBuffer)
+	if err != nil {
+		return nil, err
+	}
+	if uint64(decodedLen) > d.maxSize+recordMetadataAllowance {
+		return nil, fmt.Errorf("decoded record is too long")
 	}
 	dataBuffer, err = snappy.Decode(nil, dataBuffer)
 	if err != nil {
@@ -130,6 +169,11 @@ func (d *Database) Lookup(key uint64, userAgent string, probeRequest bool) (rec 
 	var record Record
 	if err := proto.Unmarshal(dataBuffer, &record); err != nil {
 		return nil, err
+	}
+	if validate != nil {
+		if err := validate(&record); err != nil {
+			return nil, err
+		}
 	}
 	if record.SelfBurning || d.allBurn {
 		if blockedbots.IsBlockedCrawler(userAgent) {
@@ -146,24 +190,20 @@ func (d *Database) Lookup(key uint64, userAgent string, probeRequest bool) (rec 
 			return nil, err
 		}
 	} else if d.lru != nil {
-		d.mu.Lock()
 		d.lru.Set(key, &record, recordSize(&record))
-		d.mu.Unlock()
 	}
 	return &record, nil
 }
 
 func (d *Database) Delete(key uint64) error {
 	d.mu.Lock()
-	if d.lru != nil {
-		d.lru.DeleteIfExists(key)
-	}
-	indexLen := d.indexLen
-	dataLen := d.dataLen
-	d.mu.Unlock()
-	dataBegin, dataEnd, err := d.getOffsets(key, indexLen, dataLen)
+	defer d.mu.Unlock()
+	dataBegin, dataEnd, err := d.getOffsets(key, d.indexLen, d.dataLen)
 	if err != nil {
 		return err
+	}
+	if d.lru != nil {
+		d.lru.DeleteIfExists(key)
 	}
 	if err := d.wipeData(dataBegin, dataEnd); err != nil {
 		return err
@@ -172,6 +212,9 @@ func (d *Database) Delete(key uint64) error {
 }
 
 func (d *Database) Add(record *Record) (uint64, error) {
+	if uint64(proto.Size(record)) > d.maxSize+recordMetadataAllowance {
+		return 0, fmt.Errorf("decoded record is too long")
+	}
 	data, err := proto.Marshal(record)
 	if err != nil {
 		return 0, err
@@ -181,22 +224,46 @@ func (d *Database) Add(record *Record) (uint64, error) {
 		return 0, fmt.Errorf("the record seems to be too long")
 	}
 	d.mu.Lock()
+	defer d.mu.Unlock()
+	if d.writeErr != nil {
+		return 0, d.writeErr
+	}
 	indexLen := d.indexLen
-	d.indexLen += 8
 	key := indexLen / 8
 	dataLen := d.dataLen
-	d.dataLen += uint64(len(data))
-	if !(record.SelfBurning || d.allBurn) && d.lru != nil {
-		d.lru.Set(key, record, recordSize(record))
+	const maxFileSize = uint64(1<<63 - 1)
+	if indexLen > maxFileSize-8 || uint64(len(data)) > maxFileSize-dataLen {
+		return 0, fmt.Errorf("database is too large")
 	}
-	d.mu.Unlock()
-	if _, err := d.data.WriteAt(data, int64(dataLen)); err != nil {
-		return 0, err
+	rollback := func(writeErr error) (uint64, error) {
+		// Never reuse an offset after a failed encrypted write in this process.
+		// Keep existing records readable, but require operator intervention
+		// before accepting further writes.
+		d.writeErr = fmt.Errorf("database append failed; writes disabled: %w", writeErr)
+		// Restore the previous last record's boundary on disk as well as in
+		// memory. A partial append must not become visible after a restart.
+		rollbackErr := errors.Join(d.rawData.Truncate(int64(dataLen)), d.rawIndex.Truncate(int64(indexLen)))
+		if rollbackErr != nil {
+			d.writeErr = errors.Join(d.writeErr, fmt.Errorf("database rollback failed: %w", rollbackErr))
+		}
+		return 0, d.writeErr
+	}
+	if n, err := d.data.WriteAt(data, int64(dataLen)); err != nil {
+		return rollback(err)
+	} else if n != len(data) {
+		return rollback(io.ErrShortWrite)
 	}
 	indexBuffer := make([]byte, 8)
 	binary.LittleEndian.PutUint64(indexBuffer, dataLen)
-	if _, err := d.index.WriteAt(indexBuffer, int64(indexLen)); err != nil {
-		return 0, err
+	if n, err := d.index.WriteAt(indexBuffer, int64(indexLen)); err != nil {
+		return rollback(err)
+	} else if n != len(indexBuffer) {
+		return rollback(io.ErrShortWrite)
+	}
+	d.indexLen += 8
+	d.dataLen += uint64(len(data))
+	if !(record.SelfBurning || d.allBurn) && d.lru != nil {
+		d.lru.Set(key, record, recordSize(record))
 	}
 	return key, nil
 }

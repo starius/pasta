@@ -4,6 +4,7 @@ import (
 	"crypto/cipher"
 	"encoding/binary"
 	"fmt"
+	"io"
 )
 
 type EncryptedFile struct {
@@ -37,9 +38,15 @@ func allZeros(p []byte) bool {
 }
 
 func (f *EncryptedFile) ReadAt(p []byte, off int64) (n int, err error) {
+	if off < 0 {
+		return 0, fmt.Errorf("negative file offset")
+	}
 	n, err = f.impl.ReadAt(p, off)
 	if err != nil {
 		return n, err
+	}
+	if n != len(p) {
+		return n, io.ErrUnexpectedEOF
 	}
 	if allZeros(p) {
 		return n, fmt.Errorf("data was wiped")
@@ -49,6 +56,15 @@ func (f *EncryptedFile) ReadAt(p []byte, off int64) (n int, err error) {
 }
 
 func (f *EncryptedFile) WriteAt(p []byte, off int64) (n int, err error) {
+	if off < 0 {
+		return 0, fmt.Errorf("negative file offset")
+	}
+	// io.WriterAt must not modify its caller's buffer.
+	p = append([]byte(nil), p...)
 	applyCTR(f.block, p, off)
-	return f.impl.WriteAt(p, off)
+	n, err = f.impl.WriteAt(p, off)
+	if err == nil && n != len(p) {
+		err = io.ErrShortWrite
+	}
+	return n, err
 }

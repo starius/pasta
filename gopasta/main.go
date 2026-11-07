@@ -16,6 +16,7 @@ import (
 	"os"
 	"strings"
 	"syscall"
+	"time"
 	"unicode/utf8"
 
 	"github.com/starius/pasta/gopasta/database"
@@ -31,7 +32,7 @@ import (
 
 var (
 	dir          = flag.String("dir", ".", "Directory to store data in")
-	listen       = flag.String("listen", ":8042", "Address to listen on")
+	listen       = flag.String("listen", "127.0.0.1:8042", "Address for the plaintext HTTP listener")
 	letsDomains  = flag.String("letsencrypt-domains", "", "Run Let's Encrypt on these domains")
 	domains      = flag.String("domains", "", "List of domains listed on the main page")
 	secretFile   = flag.String("secret-file", "", "Secret file")
@@ -45,6 +46,9 @@ var (
 	maxSize      = flag.Int("max-size", 10*1024*1024, "Max record size, bytes")
 	cacheRecords = flag.Int("cache-records", 10000, "Cache size, records")
 	cacheBytes   = flag.Int("cache-bytes", 100*1024*1024, "Cache size, bytes")
+	readTimeout  = flag.Duration("read-timeout", 2*time.Minute, "Maximum time to read a request, including its body")
+	writeTimeout = flag.Duration("write-timeout", 2*time.Minute, "Maximum time to write a response")
+	maxRequests  = flag.Int("max-requests", 16, "Maximum concurrent application requests across listeners")
 )
 
 const saltHex = "b59e698ae2b5893a2a45edf3f809ef5977aa9b3526fbb76cf188817d6bbf19e3"
@@ -54,7 +58,7 @@ const adminAuthInfo = "adminAuth"
 const certInfo = "cert"
 
 func redirectToHTTPS(w http.ResponseWriter, r *http.Request) {
-	url := "https://" + r.Host + r.URL.Path
+	url := "https://" + r.Host + r.URL.EscapedPath()
 	if len(r.URL.RawQuery) > 0 {
 		url += "?" + r.URL.RawQuery
 	}
@@ -75,6 +79,33 @@ func decodeSecret(secret []byte) ([]byte, error) {
 	return key, nil
 }
 
+func newHTTPServer(addr string, handler http.Handler, readTimeout, writeTimeout time.Duration) *http.Server {
+	return &http.Server{
+		Addr:              addr,
+		Handler:           handler,
+		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       readTimeout,
+		WriteTimeout:      writeTimeout,
+		IdleTimeout:       time.Minute,
+		MaxHeaderBytes:    32 << 10,
+	}
+}
+
+func limitRequests(handler http.Handler, maximum int) http.Handler {
+	slots := make(chan struct{}, maximum)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		select {
+		case slots <- struct{}{}:
+			defer func() { <-slots }()
+			handler.ServeHTTP(w, r)
+		default:
+			w.Header().Set("Retry-After", "1")
+			w.Header().Set("Cache-Control", "no-store")
+			http.Error(w, "server busy", http.StatusServiceUnavailable)
+		}
+	})
+}
+
 func main() {
 	flag.Parse()
 	if *genSecret {
@@ -91,6 +122,9 @@ func main() {
 	}
 	if *dir == "" {
 		log.Fatalf("Please specify -dir")
+	}
+	if *maxSize <= 0 || *cacheRecords < 0 || *cacheBytes < 0 || *maxRequests <= 0 || *readTimeout <= 0 || *writeTimeout <= 0 {
+		log.Fatal("Size, request and timeout limits must be positive; cache limits may be zero")
 	}
 	var err error
 	var secret []byte
@@ -183,7 +217,7 @@ func main() {
 	if len(domainsList[0]) == 0 {
 		domainsList = nil
 	}
-	handler := server.NewHandler(db, idEncoder, *maxSize, adminAuth, domainsList, *allowFiles, *filesBurn, *allBurn, *filesScheme, *filesHost)
+	handler := limitRequests(server.NewHandler(db, idEncoder, *maxSize, adminAuth, domainsList, *allowFiles, *filesBurn, *allBurn, *filesScheme, *filesHost), *maxRequests)
 
 	if *letsDomains != "" {
 		// Use Let's Encrypt.
@@ -217,12 +251,12 @@ func main() {
 			log.Fatal(err)
 		}
 		go func() {
-			log.Fatal(http.ListenAndServe(":80", certHandler))
+			log.Fatal(newHTTPServer(":80", certHandler, *readTimeout, *writeTimeout).ListenAndServe())
 		}()
 		go func() {
-			log.Fatal(http.Serve(ln, handler))
+			log.Fatal(newHTTPServer(":443", handler, *readTimeout, *writeTimeout).Serve(ln))
 		}()
 	}
 
-	log.Fatal(http.ListenAndServe(*listen, handler))
+	log.Fatal(newHTTPServer(*listen, handler, *readTimeout, *writeTimeout).ListenAndServe())
 }
